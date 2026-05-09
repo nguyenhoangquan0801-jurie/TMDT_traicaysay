@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Cart from "./components/Cart";
 import CheckoutPage from "./pages/CheckoutPage";
+import ProductDetail from "./pages/ProductDetail";
 
 function App() {
   return (
@@ -12,9 +13,12 @@ function App() {
     <BrowserRouter>
       <Navbar />
       <Cart />   
+      
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/checkout" element={<ProductDetail />} />
+
       </Routes>
     </BrowserRouter>
   </CartProvider>

@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { FaPlus, FaMinus, FaTrash,} from "react-icons/fa";
+import { FaPlus, FaMinus, FaTrash, } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { CartContext, } from "../context/CartContext";
 
@@ -13,6 +13,7 @@ const Cart = () => {
         addToCart,
         decreaseQty,
         removeFromCart,
+        toggleCart,
     } = useContext(CartContext);
 
     if (!isCartOpen) return null;
@@ -114,9 +115,14 @@ const Cart = () => {
 
                         <button
                             style={styles.checkoutBtn}
-                            onClick={() =>
-                                navigate("/checkout")
-                            }
+                            onClick={() => {
+
+                                // ĐÓNG CART
+                                toggleCart();
+
+                                // CHUYỂN TRANG
+                                navigate("/checkout");
+                            }}
                         >
                             THANH TOÁN
                         </button>
@@ -203,18 +209,18 @@ const styles = {
     },
 
     icon: {
-    width: "28px",
-    height: "28px",
-    borderRadius: "50%",
-    background: "#e9f1ea",
-    color: "#151111",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    cursor: "pointer",
-    fontSize: "12px",
-    fontWeight: "bold",
-},
+        width: "28px",
+        height: "28px",
+        borderRadius: "50%",
+        background: "#e9f1ea",
+        color: "#151111",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        cursor: "pointer",
+        fontSize: "12px",
+        fontWeight: "bold",
+    },
 
     qty: {
         minWidth: "20px",
@@ -245,7 +251,7 @@ const styles = {
         marginTop: "20px",
         border: "none",
         borderRadius: "35px",
-        background:  "linear-gradient(135deg,#43a047,#2e7d32)",
+        background: "linear-gradient(135deg,#43a047,#2e7d32)",
         color: "#fff",
         fontWeight: "bold",
         fontSize: "16px",
