@@ -50,7 +50,7 @@ export const CartProvider = ({ children }) => {
             0
         );
 
-        // 🚨 GIỚI HẠN 15 SẢN PHẨM
+        // GIỚI HẠN 15 SẢN PHẨM
         if (totalQty > 15) {
             alert("❌ Không được đặt quá 15 sản phẩm!");
             return;

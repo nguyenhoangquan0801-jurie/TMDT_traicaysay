@@ -1,223 +1,94 @@
 import React, { useContext } from "react";
-
+import "../css/ProductCart.css";
 import { FaShoppingCart } from "react-icons/fa";
-
 import { CartContext } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
 
 const ProductCard = ({ product }) => {
 
-    const { addToCart } =
-        useContext(CartContext);
+  const { addToCart } = useContext(CartContext);
+  const navigate = useNavigate();
 
-    return (
-        <div style={styles.card}>
+  return (
+    <div className="card">
 
-            {/* DISCOUNT */}
-            {product.discount && (
-                <div style={styles.discount}>
-                    -{product.discount}%
-                </div>
-            )}
-
-            {/* IMAGE */}
-            <img
-                src={product.image}
-                alt={product.name}
-                style={styles.image}
-            />
-
-            {/* NAME */}
-            <h3 style={styles.name}>
-                {product.name}
-            </h3>
-
-            {/* DESCRIPTION */}
-            <p style={styles.description}>
-                {product.description}
-            </p>
-
-            {/* PRICE */}
-            <div style={styles.priceBox}>
-
-                <span style={styles.newPrice}>
-                    {product.price
-                        ? product.price.toLocaleString()
-                        : 0}
-                    đ
-                </span>
-
-                {product.oldPrice && (
-                    <span style={styles.oldPrice}>
-                        {product.oldPrice.toLocaleString()}
-                        đ
-                    </span>
-                )}
-            </div>
-
-            {/* INFO */}
-            <div style={styles.infoBox}>
-                <span>
-                    ⭐ {product.rating || 5.0}
-                </span>
-
-                <span>
-                    Đã bán: {product.sold || 0}
-                </span>
-            </div>
-
-            {/* BUTTON */}
-            <button
-                style={styles.button}
-                onClick={() => addToCart(product)}
-            >
-                <FaShoppingCart />
-
-                <span>
-                    Thêm vào giỏ
-                </span>
-            </button>
+      {product.discount && (
+        <div className="discount">
+          -{product.discount}%
         </div>
-    );
-};
+      )}
 
-const styles = {
+      <div className="image-box">
 
-    card: {
-        background: "#fff",
+        <img
+          src={product.image}
+          alt={product.name}
+          className="product-image"
+        />
 
-        borderRadius: "20px",
+        <div className="product-overlay">
 
-        overflow: "hidden",
+          <button
+            className="detail-btn"
+            onClick={() =>
+              navigate(`/product/${product.id}`)
+            }
+          >
+            Xem chi tiết
+          </button>
 
-        padding: "18px",
+        </div>
+      </div>
 
-        boxShadow:
-            "0 4px 15px rgba(0,0,0,0.08)",
+      <h3 className="name">
+        {product.name}
+      </h3>
 
-        transition: "0.3s",
+      <p className="description">
+        {product.description}
+      </p>
 
-        position: "relative",
+      <div className="price-box">
 
-        cursor: "pointer",
-    },
+        <span className="new-price">
+          {product.price
+            ? product.price.toLocaleString()
+            : 0}
+          đ
+        </span>
 
-    discount: {
-        position: "absolute",
+        {product.oldPrice && (
+          <span className="old-price">
+            {product.oldPrice.toLocaleString()}
+            đ
+          </span>
+        )}
+      </div>
 
-        top: "15px",
-        left: "15px",
+      <div className="info-box">
 
-        background: "#e53935",
+        <span>
+          ⭐ {product.rating || 5.0}
+        </span>
 
-        color: "#fff",
+        <span>
+          Đã bán: {product.sold || 0}
+        </span>
 
-        padding: "6px 12px",
+      </div>
 
-        borderRadius: "20px",
+      <button
+        className="cart-btn"
+        onClick={() => addToCart(product)}
+      >
+        <FaShoppingCart />
 
-        fontSize: "13px",
-
-        fontWeight: "bold",
-    },
-
-    image: {
-        width: "100%",
-
-        height: "230px",
-
-        objectFit: "cover",
-
-        borderRadius: "15px",
-
-        marginBottom: "15px",
-    },
-
-    name: {
-        fontSize: "18px",
-
-        color: "#333",
-
-        marginBottom: "10px",
-
-        minHeight: "45px",
-    },
-
-    description: {
-        color: "#777",
-
-        fontSize: "14px",
-
-        marginBottom: "15px",
-
-        minHeight: "40px",
-    },
-
-    priceBox: {
-        display: "flex",
-
-        alignItems: "center",
-
-        gap: "10px",
-
-        marginBottom: "15px",
-    },
-
-    newPrice: {
-        color: "#e53935",
-
-        fontSize: "24px",
-
-        fontWeight: "bold",
-    },
-
-    oldPrice: {
-        color: "#999",
-
-        textDecoration: "line-through",
-
-        fontSize: "15px",
-    },
-
-    infoBox: {
-        display: "flex",
-
-        justifyContent: "space-between",
-
-        marginBottom: "18px",
-
-        color: "#666",
-
-        fontSize: "14px",
-    },
-
-    button: {
-        width: "100%",
-
-        padding: "13px",
-
-        border: "none",
-
-        borderRadius: "30px",
-
-        background:
-            "linear-gradient(135deg,#43a047,#2e7d32)",
-
-        color: "#fff",
-
-        fontWeight: "bold",
-
-        display: "flex",
-
-        justifyContent: "center",
-
-        alignItems: "center",
-
-        gap: "10px",
-
-        cursor: "pointer",
-
-        fontSize: "15px",
-    },
+        <span>
+          Thêm vào giỏ
+        </span>
+      </button>
+    </div>
+  );
 };
 
 export default ProductCard;

@@ -1,75 +1,160 @@
 import React from "react";
-
+import "../css/Home.css";
 import products from "../data/mockProduct";
-
 import ProductCard from "../components/ProductCard";
 
 const Home = () => {
   return (
-    <div style={styles.page}>
+    <div>
+   
+      <div className="page">
 
-      <div style={styles.banner}>
+        <div className="banner">
+          <div>
+            <h1 className="title">
+              HEALTHY FRUIT SHOP 🍍
+            </h1>
 
-        <div>
-          <h1 style={styles.title}>
-            HEALTHY FRUIT SHOP 🍍
-          </h1>
+            <p className="text">
+              Trái cây sấy healthy thơm ngon
+            </p>
+          </div>
+        </div>
 
-          <p style={styles.text}>
-            Trái cây sấy healthy thơm ngon
-          </p>
+        <div className="grid">
+          {products.map((p) => (
+            <ProductCard
+              key={p.id}
+              product={p}
+            />
+          ))}
         </div>
       </div>
-      <div style={styles.grid}>
-        {products.map((p) => (
-          <ProductCard
-            key={p.id}
-            product={p}
-          />
-        ))}
-      </div>
+
+      <footer className="footer">
+
+        <div className="footer-top">
+
+          <div className="socials">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/124/124010.png"
+              alt="facebook"
+              className="icon"
+            />
+
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png"
+              alt="instagram"
+              className="icon"
+            />
+
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png"
+              alt="youtube"
+              className="icon"
+            />
+
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/3046/3046121.png"
+              alt="tiktok"
+              className="icon"
+            />
+          </div>
+
+          <div className="subscribe">
+
+            <p className="subscribe-text">
+              Bạn muốn nhận khuyến mãi đặc biệt?
+              Đăng ký ngay.
+            </p>
+
+            <div className="input-box">
+              <input
+                type="text"
+                placeholder="Thả email nhận ngay ưu đãi khủng"
+                className="input"
+              />
+
+              <button className="button">
+                Đăng ký
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+
+          <div>
+            <h3 className="heading">
+              Địa chỉ:
+            </h3>
+
+            <p className="info">
+              311-G9 Đường số 8,
+              Phường Bình Trưng,
+              Thủ Đức
+            </p>
+
+            <p className="info">
+              <strong>Số điện thoại:</strong>
+              0901956070
+            </p>
+
+            <p className="info">
+              <strong>Email:</strong>
+              support@nonglamfood.com
+            </p>
+          </div>
+
+          <div>
+            <h3 className="heading">
+              Thông tin
+            </h3>
+
+            <ul className="list">
+              <li>TRANG CHỦ</li>
+              <li>SẢN PHẨM</li>
+              <li>TIN TỨC | MẸO VẶT</li>
+              <li>GIỚI THIỆU</li>
+              <li>HỢP TÁC</li>
+              <li>KIỂM TRA ĐƠN HÀNG</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="heading">
+              Hỗ trợ khách hàng
+            </h3>
+
+            <ul className="list">
+              <li>TÌM KIẾM</li>
+              <li>CHÍNH SÁCH ĐỔI TRẢ</li>
+              <li>CHÍNH SÁCH BẢO MẬT</li>
+              <li>THANH TOÁN VÀ VẬN CHUYỂN</li>
+              <li>ĐIỀU KHOẢN VÀ QUY ĐỊNH CHUNG</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="heading">
+              Tổng đài hỗ trợ
+            </h3>
+
+            <p className="info">
+              Hotline:
+              <span className="hotline">
+                0901956070
+              </span>
+            </p>
+
+            <p className="payment">
+              Phương thức thanh toán
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
-};
-
-const styles = {
-  page: {
-    padding: "30px",
-  },
-
-  banner: {
-    height: "300px",
-    borderRadius: "20px",
-    marginBottom: "40px",
-
-    backgroundImage:
-      "url('https://images.unsplash.com/photo-1610832958506-aa56368176cf?q=80&w=1600&auto=format&fit=crop')",
-
-    backgroundSize: "cover",
-
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-
-    color: "white",
-  },
-  title: {
-    fontSize: "50px",
-  },
-
-  text: {
-    textAlign: "center",
-    fontSize: "20px",
-  },
-
-  grid: {
-    display: "grid",
-
-    gridTemplateColumns:
-      "repeat(auto-fit,minmax(250px,1fr))",
-
-    gap: "25px",
-  },
 };
 
 export default Home;

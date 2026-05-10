@@ -9,19 +9,19 @@ import ProductDetail from "./pages/ProductDetail";
 
 function App() {
   return (
-  <CartProvider>
-    <BrowserRouter>
-      <Navbar />
-      <Cart />   
-      
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/checkout" element={<ProductDetail />} />
+    <CartProvider>
+      <BrowserRouter>
+        <Navbar />
+        <Cart />
 
-      </Routes>
-    </BrowserRouter>
-  </CartProvider>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
+
+        </Routes>
+      </BrowserRouter>
+    </CartProvider>
   );
 }
 
