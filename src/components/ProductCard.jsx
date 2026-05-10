@@ -1,223 +1,66 @@
-import React, { useContext } from "react";
-
-import { FaShoppingCart } from "react-icons/fa";
-
-import { CartContext } from "../context/CartContext";
+import { useCart } from '../context/CartContext';
+import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 const ProductCard = ({ product }) => {
-
-    const { addToCart } =
-        useContext(CartContext);
-
-    return (
-        <div style={styles.card}>
-
-            {/* DISCOUNT */}
-            {product.discount && (
-                <div style={styles.discount}>
-                    -{product.discount}%
-                </div>
-            )}
-
-            {/* IMAGE */}
-            <img
-                src={product.image}
-                alt={product.name}
-                style={styles.image}
-            />
-
-            {/* NAME */}
-            <h3 style={styles.name}>
-                {product.name}
-            </h3>
-
-            {/* DESCRIPTION */}
-            <p style={styles.description}>
-                {product.description}
-            </p>
-
-            {/* PRICE */}
-            <div style={styles.priceBox}>
-
-                <span style={styles.newPrice}>
-                    {product.price
-                        ? product.price.toLocaleString()
-                        : 0}
-                    đ
-                </span>
-
-                {product.oldPrice && (
-                    <span style={styles.oldPrice}>
-                        {product.oldPrice.toLocaleString()}
-                        đ
-                    </span>
-                )}
-            </div>
-
-            {/* INFO */}
-            <div style={styles.infoBox}>
-                <span>
-                    ⭐ {product.rating || 5.0}
-                </span>
-
-                <span>
-                    Đã bán: {product.sold || 0}
-                </span>
-            </div>
-
-            {/* BUTTON */}
-            <button
-                style={styles.button}
-                onClick={() => addToCart(product)}
-            >
-                <FaShoppingCart />
-
-                <span>
-                    Thêm vào giỏ
-                </span>
-            </button>
-        </div>
-    );
-};
-
-const styles = {
-
-    card: {
-        background: "#fff",
-
-        borderRadius: "20px",
-
-        overflow: "hidden",
-
-        padding: "18px",
-
-        boxShadow:
-            "0 4px 15px rgba(0,0,0,0.08)",
-
-        transition: "0.3s",
-
-        position: "relative",
-
-        cursor: "pointer",
-    },
-
-    discount: {
-        position: "absolute",
-
-        top: "15px",
-        left: "15px",
-
-        background: "#e53935",
-
-        color: "#fff",
-
-        padding: "6px 12px",
-
-        borderRadius: "20px",
-
-        fontSize: "13px",
-
-        fontWeight: "bold",
-    },
-
-    image: {
-        width: "100%",
-
-        height: "230px",
-
-        objectFit: "cover",
-
-        borderRadius: "15px",
-
-        marginBottom: "15px",
-    },
-
-    name: {
-        fontSize: "18px",
-
-        color: "#333",
-
-        marginBottom: "10px",
-
-        minHeight: "45px",
-    },
-
-    description: {
-        color: "#777",
-
-        fontSize: "14px",
-
-        marginBottom: "15px",
-
-        minHeight: "40px",
-    },
-
-    priceBox: {
-        display: "flex",
-
-        alignItems: "center",
-
-        gap: "10px",
-
-        marginBottom: "15px",
-    },
-
-    newPrice: {
-        color: "#e53935",
-
-        fontSize: "24px",
-
-        fontWeight: "bold",
-    },
-
-    oldPrice: {
-        color: "#999",
-
-        textDecoration: "line-through",
-
-        fontSize: "15px",
-    },
-
-    infoBox: {
-        display: "flex",
-
-        justifyContent: "space-between",
-
-        marginBottom: "18px",
-
-        color: "#666",
-
-        fontSize: "14px",
-    },
-
-    button: {
-        width: "100%",
-
-        padding: "13px",
-
-        border: "none",
-
-        borderRadius: "30px",
-
-        background:
-            "linear-gradient(135deg,#43a047,#2e7d32)",
-
-        color: "#fff",
-
-        fontWeight: "bold",
-
-        display: "flex",
-
-        justifyContent: "center",
-
-        alignItems: "center",
-
-        gap: "10px",
-
-        cursor: "pointer",
-
-        fontSize: "15px",
-    },
+  console.log("ProductCard rendered with:", product);
+
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
+  const [isLiked, setIsLiked] = useState(false);
+
+  // Debug chi tiết
+  if (!product) {
+    console.error("🚨 ERROR: Product is undefined or null!");
+    return <div className="h-96 bg-red-100 rounded-3xl">Product undefined</div>;
+  }
+
+  if (!product.name) {
+    console.error("🚨 ERROR: Product exists but .name is missing!", product);
+  }
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    addToCart(product);
+  };
+
+  return (
+    <div 
+      onClick={() => product.id && navigate(`/product/${product.id}`)}
+      className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl border border-gray-100 h-full flex flex-col cursor-pointer"
+    >
+      <div className="h-64 bg-gray-100 relative">
+        {product.image ? (
+          <img 
+            src={product.image} 
+            alt={product.name || 'Sản phẩm'} 
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="h-full flex items-center justify-center text-6xl opacity-30">
+            {product.name?.[0] || '?'}
+          </div>
+        )}
+      </div>
+
+      <div className="p-5 flex-1 flex flex-col">
+        <h3 className="font-semibold text-lg line-clamp-2">
+          {product.name || 'Không có tên'}
+        </h3>
+        
+        <p className="text-green-600 font-bold text-xl mt-2">
+          {Number(product.price || 0).toLocaleString('vi-VN')}đ
+        </p>
+
+        <button 
+          onClick={handleAddToCart}
+          className="mt-auto bg-green-600 hover:bg-green-700 text-white py-3 rounded-2xl mt-4"
+        >
+          Thêm vào giỏ hàng
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default ProductCard;

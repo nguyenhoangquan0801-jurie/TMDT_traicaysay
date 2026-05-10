@@ -1,94 +1,93 @@
-import React, { createContext, useState } from "react";
+import { createContext, useState, useContext, useEffect } from 'react';
 
-export const CartContext = createContext();
+// Tạo Context
+const CartContext = createContext();
 
+// Provider
 export const CartProvider = ({ children }) => {
-    const [cart, setCart] = useState([]);
-    const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cart, setCart] = useState([]);
 
-    const toggleCart = () => {
-        setIsCartOpen((prev) => !prev);
-    };
+  // Load cart từ localStorage khi component mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      try {
+        setCart(JSON.parse(savedCart));
+      } catch (error) {
+        console.error('Error parsing cart from localStorage:', error);
+        localStorage.removeItem('cart');
+      }
+    }
+  }, []);
 
-    const addToCart = (product) => {
-        setCart((prev) => {
-            const exist = prev.find((i) => i.id === product.id);
+  // Lưu cart vào localStorage mỗi khi cart thay đổi
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
 
-            if (exist) {
-                return prev.map((i) =>
-                    i.id === product.id
-                        ? { ...i, qty: i.qty + 1 }
-                        : i
-                );
-            }
-
-            return [...prev, { ...product, qty: 1 }];
-        });
-    };
-
-    const decreaseQty = (id) => {
-        setCart((prev) =>
-            prev
-                .map((i) =>
-                    i.id === id ? { ...i, qty: i.qty - 1 } : i
-                )
-                .filter((i) => i.qty > 0)
+  const addToCart = (product) => {
+    setCart(prevCart => {
+      const existingProduct = prevCart.find(item => item.id === product.id);
+      
+      if (existingProduct) {
+        return prevCart.map(item =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         );
-    };
+      } else {
+        return [...prevCart, { ...product, quantity: 1 }];
+      }
+    });
+  };
 
-    const removeFromCart = (id) => {
-        setCart((prev) => prev.filter((i) => i.id !== id));
-    };
+  const removeFromCart = (id) => {
+    setCart(prevCart => prevCart.filter(item => item.id !== id));
+  };
 
-    const [orders, setOrders] = useState([]); // 🧾 lưu đơn hàng
-
-    const checkout = () => {
-        if (cart.length === 0) return;
-
-        const totalQty = cart.reduce(
-            (sum, item) => sum + item.qty,
-            0
-        );
-
-        // 🚨 GIỚI HẠN 15 SẢN PHẨM
-        if (totalQty > 15) {
-            alert("❌ Không được đặt quá 15 sản phẩm!");
-            return;
-        }
-
-        const newOrder = {
-            id: Date.now(),
-            items: cart,
-            total: cart.reduce(
-                (sum, item) => sum + item.price * item.qty,
-                0
-            ),
-            createdAt: new Date().toLocaleString(),
-        };
-
-        setCart([]);
-        setIsCartOpen(false);
-
-        const checkout = () => {
-            setCart([]);
-        };
-        console.log("ORDER:", newOrder);
-    };
-
-    return (
-        <CartContext.Provider
-            value={{
-                cart,
-                isCartOpen,
-                toggleCart,
-                addToCart,
-                decreaseQty,
-                removeFromCart,
-                checkout,
-                orders,
-            }}
-        >
-            {children}
-        </CartContext.Provider>
+  const updateQuantity = (id, quantity) => {
+    if (quantity < 1) return;
+    
+    setCart(prevCart =>
+      prevCart.map(item =>
+        item.id === id ? { ...item, quantity } : item
+      )
     );
+  };
+
+  const clearCart = () => {
+    setCart([]);
+  };
+
+  const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+
+  return (
+    <CartContext.Provider value={{
+      cart,
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      clearCart,
+      cartTotal,
+      cartCount
+    }}>
+      {children}
+    </CartContext.Provider>
+  );
 };
+
+// Custom Hook với error handling tốt
+export const useCart = () => {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error('useCart must be used within a CartProvider');
+  }
+  return context;
+};
+
+// Export CartContext để dùng ở những nơi cần Provider trực tiếp
+export { CartContext };
+
+// Export default (tùy chọn, tiện cho import)
+export default CartContext;

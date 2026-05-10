@@ -1,6 +1,7 @@
 import React, { useContext, useState } from "react";
 import { CartContext } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import { useCart } from '../context/CartContext';
 
 
 const CheckoutPage = () => {
@@ -30,25 +31,25 @@ const CheckoutPage = () => {
             0
         );
 
-        // ❌ CHƯA CÓ SẢN PHẨM
+        //  CHƯA CÓ SẢN PHẨM
         if (cart.length === 0) {
             setMessage({
-                text: "❌ Chưa có sản phẩm trong giỏ hàng!",
+                text: " Chưa có sản phẩm trong giỏ hàng!",
                 type: "error"
             });
             return;
         }
 
-        // ❌ QUÁ SỐ LƯỢNG
+        //  QUÁ SỐ LƯỢNG
         if (totalQty > 15) {
             setMessage({
-                text: "❌  Quá 15 sản phẩm. Không thể thanh toán!",
+                text: "  Quá 15 sản phẩm. Không thể thanh toán!",
                 type: "error"
             });
             return;
         }
 
-        // ✅ THÀNH CÔNG
+        //  THÀNH CÔNG
         checkout();
 
         setMessage({
@@ -75,7 +76,7 @@ const CheckoutPage = () => {
                 {/* LEFT */}
                 <div style={styles.left}>
 
-                    <h1 style={styles.title}>🧾 Thanh toán</h1>
+                    <h1 style={styles.title}> Thanh toán</h1>
 
                     {message.text && (
                         <div
@@ -126,7 +127,7 @@ const CheckoutPage = () => {
                             style={styles.checkoutBtn}
                             onClick={handleCheckout}
                         >
-                            🧾 Xác nhận thanh toán
+                             Xác nhận thanh toán
                         </button>
 
                         <button
@@ -141,7 +142,7 @@ const CheckoutPage = () => {
                 {/* RIGHT */}
                 <div style={styles.right}>
                     <h2 style={styles.orderTitle}>
-                        🛒 Đơn hàng của bạn
+                         Đơn hàng của bạn
                     </h2>
 
                     {cart.length === 0 ? (
