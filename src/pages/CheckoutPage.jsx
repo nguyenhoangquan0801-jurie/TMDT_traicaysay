@@ -1,350 +1,451 @@
-import React, { useContext, useState } from "react";
-import { CartContext } from "../context/CartContext";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 
-
 const CheckoutPage = () => {
-    const { cart, checkout } = useContext(CartContext);
-    const navigate = useNavigate();
-    const MAX_QTY = 15;
+  const navigate = useNavigate();
 
-    const [form, setForm] = useState({
-        name: "",
-        phone: "",
-        address: "",
+  const {
+    cart,
+    clearCart,
+    cartTotal,
+    cartCount,
+  } = useCart();
+
+  const MAX_QTY = 15;
+
+  // =========================
+  // FORM
+  // =========================
+  const [form, setForm] = useState({
+    name: '',
+    phone: '',
+    address: '',
+  });
+
+  // =========================
+  // MESSAGE
+  // =========================
+  const [message, setMessage] = useState({
+    text: '',
+    type: '',
+  });
+
+  // =========================
+  // HANDLE INPUT
+  // =========================
+  const handleChange = (e) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
     });
+  };
 
-    const [message, setMessage] = useState({
-        text: "",
-        type: "" // "success" | "error"
-    });
+  // =========================
+  // SHOW MESSAGE
+  // =========================
+  const showMessage = (text, type) => {
+    setMessage({ text, type });
 
-    const total = cart.reduce(
-        (sum, item) => sum + item.price * item.qty,
-        0
-    );
+    setTimeout(() => {
+      setMessage({
+        text: '',
+        type: '',
+      });
+    }, 3000);
+  };
 
-    const handleCheckout = () => {
-        const totalQty = cart.reduce(
-            (sum, item) => sum + item.qty,
-            0
-        );
-
-        //  CHƯA CÓ SẢN PHẨM
-        if (cart.length === 0) {
-            setMessage({
-                text: " Chưa có sản phẩm trong giỏ hàng!",
-                type: "error"
-            });
-            return;
-        }
-
-        //  QUÁ SỐ LƯỢNG
-        if (totalQty > 15) {
-            setMessage({
-                text: "  Quá 15 sản phẩm. Không thể thanh toán!",
-                type: "error"
-            });
-            return;
-        }
-
-        //  THÀNH CÔNG
-        checkout();
-
-        setMessage({
-            text: "🎉 Thanh toán thành công!",
-            type: "success"
-        });
-
-        setTimeout(() => {
-            setMessage({ text: "", type: "" });
-        }, 3000);
-    };
-
-    const handleChange = (e) => {
-        setForm({
-            ...form,
-            [e.target.name]: e.target.value,
-        });
-    };
-
-    return (
-        <div style={styles.page}>
-            <div style={styles.container}>
-
-                {/* LEFT */}
-                <div style={styles.left}>
-
-                    <h1 style={styles.title}> Thanh toán</h1>
-
-                    {message.text && (
-                        <div
-                            style={{
-                                ...styles.toast,
-                                background:
-                                    message.type === "success"
-                                        ? "#43a047"
-                                        : "#e53935"
-                            }}
-                        >
-                            {message.text}
-                        </div>
-                    )}
-
-                    <div style={styles.formCard}>
-                        <h3 style={styles.subTitle}>
-                            Thông tin người nhận
-                        </h3>
-
-                        <input
-                            name="name"
-                            placeholder="Nhập họ tên..."
-                            value={form.name}
-                            onChange={handleChange}
-                            style={styles.input}
-                        />
-
-                        <input
-                            name="phone"
-                            placeholder="Nhập số điện thoại..."
-                            value={form.phone}
-                            onChange={handleChange}
-                            style={styles.input}
-                        />
-
-                        <input
-                            name="address"
-                            placeholder="Nhập địa chỉ..."
-                            value={form.address}
-                            onChange={handleChange}
-                            style={styles.input}
-                        />
-                    </div>
-
-                    <div style={styles.buttonGroup}>
-                        <button
-                            style={styles.checkoutBtn}
-                            onClick={handleCheckout}
-                        >
-                             Xác nhận thanh toán
-                        </button>
-
-                        <button
-                            style={styles.backBtn}
-                            onClick={() => navigate("/")}
-                        >
-                            ⬅ Quay về trang chủ
-                        </button>
-                    </div>
-                </div>
-
-                {/* RIGHT */}
-                <div style={styles.right}>
-                    <h2 style={styles.orderTitle}>
-                         Đơn hàng của bạn
-                    </h2>
-
-                    {cart.length === 0 ? (
-                        <div style={styles.emptyCart}>
-                            Chưa có sản phẩm
-                        </div>
-                    ) : (
-                        <>
-                            {cart.map((item) => (
-                                <div
-                                    key={item.id}
-                                    style={styles.productCard}
-                                >
-                                    <img
-                                        src={item.image}
-                                        alt={item.name}
-                                        style={styles.productImage}
-                                    />
-
-                                    <div>
-                                        <h4 style={{ margin: 0 }}>
-                                            {item.name}
-                                        </h4>
-
-                                        <p style={styles.qty}>
-                                            Số lượng: {item.qty}
-                                        </p>
-
-                                        <p style={styles.price}>
-                                            {(
-                                                item.price * item.qty
-                                            ).toLocaleString()} đ
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-
-                            <div style={styles.totalBox}>
-                                <span>Tổng tiền</span>
-
-                                <span>
-                                    {total.toLocaleString()} đ
-                                </span>
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-};
-const styles = {
-    page: {
-        minHeight: "100vh",
-        background: "#f4f6f9",
-        padding: "40px 20px",
-    },
-
-    container: {
-        maxWidth: "1200px",
-        margin: "0 auto",
-        display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "30px",
-    },
-
-    left: {
-        background: "#fff",
-        padding: "35px",
-        borderRadius: "20px",
-        boxShadow: "0 5px 20px rgba(0,0,0,0.08)",
-    },
-
-    right: {
-        background: "#fff",
-        padding: "35px",
-        borderRadius: "20px",
-        boxShadow: "0 5px 20px rgba(0,0,0,0.08)",
-    },
-
-    title: {
-        marginBottom: "25px",
-        color: "#2e7d32",
-        fontSize: "32px",
-    },
-
-    subTitle: {
-        marginBottom: "20px",
-        color: "#333",
-    },
-
-    orderTitle: {
-        marginBottom: "25px",
-        color: "#2e7d32",
-    },
-
-    formCard: {
-        marginBottom: "25px",
-    },
-
-    input: {
-        display: "block",
-        width: "100%",
-        padding: "14px",
-        marginBottom: "18px",
-        border: "1px solid #ddd",
-        borderRadius: "12px",
-        outline: "none",
-        fontSize: "15px",
-        transition: "0.3s",
-        boxSizing: "border-box",
-    },
-
-    buttonGroup: {
-        display: "flex",
-        gap: "15px",
-        marginTop: "20px",
-    },
-
-    checkoutBtn: {
-        flex: 1,
-        padding: "15px",
-        background:
-            "linear-gradient(135deg,#43a047,#2e7d32)",
-        color: "#fff",
-        border: "none",
-        borderRadius: "12px",
-        fontWeight: "bold",
-        fontSize: "15px",
-        cursor: "pointer",
-        boxShadow: "0 5px 15px rgba(67,160,71,0.3)",
-        transition: "0.3s",
-    },
-
-    backBtn: {
-        flex: 1,
-        padding: "15px",
-        background: "#f5f5f5",
-        color: "#333",
-        border: "1px solid #ddd",
-        borderRadius: "12px",
-        fontWeight: "bold",
-        cursor: "pointer",
-    },
-
-    productCard: {
-        display: "flex",
-        gap: "15px",
-        padding: "15px",
-        marginBottom: "15px",
-        borderRadius: "15px",
-        background: "#fafafa",
-        alignItems: "center",
-    },
-
-    productImage: {
-        width: "90px",
-        height: "90px",
-        objectFit: "cover",
-        borderRadius: "12px",
-    },
-
-    qty: {
-        margin: "6px 0",
-        color: "#666",
-    },
-
-    price: {
-        margin: 0,
-        color: "#2e7d32",
-        fontWeight: "bold",
-        fontSize: "18px",
-    },
-
-    totalBox: {
-        marginTop: "25px",
-        paddingTop: "20px",
-        borderTop: "2px dashed #ddd",
-        display: "flex",
-        justifyContent: "space-between",
-        fontSize: "22px",
-        fontWeight: "bold",
-        color: "#2e7d32",
-    },
-
-    emptyCart: {
-        background: "#fafafa",
-        padding: "40px",
-        textAlign: "center",
-        borderRadius: "15px",
-        color: "#888",
-        fontSize: "18px",
-    },
-
-    toast: {
-        color: "white",
-        padding: "14px",
-        borderRadius: "12px",
-        marginBottom: "20px",
-        textAlign: "center",
-        fontWeight: "bold",
-        boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+  // =========================
+  // CHECKOUT
+  // =========================
+  const handleCheckout = () => {
+    // Chưa có sản phẩm
+    if (cart.length === 0) {
+      showMessage(
+        'Giỏ hàng của bạn đang trống',
+        'error'
+      );
+      return;
     }
+
+    // Validate form
+    if (
+      !form.name ||
+      !form.phone ||
+      !form.address
+    ) {
+      showMessage(
+        'Vui lòng nhập đầy đủ thông tin',
+        'error'
+      );
+      return;
+    }
+
+    // Giới hạn số lượng
+    if (cartCount > MAX_QTY) {
+      showMessage(
+        'Không thể thanh toán quá 15 sản phẩm',
+        'error'
+      );
+      return;
+    }
+
+    // Thành công
+    clearCart();
+
+    showMessage(
+      'Thanh toán thành công',
+      'success'
+    );
+
+    // Redirect
+    setTimeout(() => {
+      navigate('/');
+    }, 2000);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div
+        className="
+          max-w-7xl
+          mx-auto
+          grid
+          lg:grid-cols-2
+          gap-8
+        "
+      >
+        {/* LEFT */}
+        <div
+          className="
+            bg-white
+            rounded-[32px]
+            shadow-xl
+            border
+            border-gray-100
+            p-8
+            md:p-10
+          "
+        >
+          {/* TITLE */}
+          <div className="mb-8">
+            <span
+              className="
+                inline-block
+                px-4
+                py-2
+                rounded-full
+                bg-green-100
+                text-green-700
+                text-sm
+                font-semibold
+              "
+            >
+              CHECKOUT
+            </span>
+
+            <h1 className="text-4xl font-bold text-gray-800 mt-5">
+              Thanh toán đơn hàng
+            </h1>
+
+            <p className="text-gray-500 mt-3">
+              Vui lòng điền đầy đủ thông tin nhận hàng
+            </p>
+          </div>
+
+          {/* MESSAGE */}
+          {message.text && (
+            <div
+              className={`
+                mb-6
+                rounded-2xl
+                px-5
+                py-4
+                text-sm
+                font-medium
+                border
+                ${
+                  message.type === 'success'
+                    ? 'bg-green-50 text-green-700 border-green-100'
+                    : 'bg-red-50 text-red-600 border-red-100'
+                }
+              `}
+            >
+              {message.text}
+            </div>
+          )}
+
+          {/* FORM */}
+          <div className="space-y-5">
+            {/* NAME */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Họ và tên
+              </label>
+
+              <input
+                type="text"
+                name="name"
+                placeholder="Nhập họ tên..."
+                value={form.name}
+                onChange={handleChange}
+                className="
+                  w-full
+                  px-5
+                  py-4
+                  rounded-2xl
+                  border
+                  border-gray-200
+                  bg-gray-50
+                  outline-none
+                  focus:border-green-500
+                  focus:ring-4
+                  focus:ring-green-100
+                  transition-all
+                  duration-200
+                "
+              />
+            </div>
+
+            {/* PHONE */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Số điện thoại
+              </label>
+
+              <input
+                type="text"
+                name="phone"
+                placeholder="Nhập số điện thoại..."
+                value={form.phone}
+                onChange={handleChange}
+                className="
+                  w-full
+                  px-5
+                  py-4
+                  rounded-2xl
+                  border
+                  border-gray-200
+                  bg-gray-50
+                  outline-none
+                  focus:border-green-500
+                  focus:ring-4
+                  focus:ring-green-100
+                  transition-all
+                  duration-200
+                "
+              />
+            </div>
+
+            {/* ADDRESS */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Địa chỉ giao hàng
+              </label>
+
+              <textarea
+                name="address"
+                rows="4"
+                placeholder="Nhập địa chỉ..."
+                value={form.address}
+                onChange={handleChange}
+                className="
+                  w-full
+                  px-5
+                  py-4
+                  rounded-2xl
+                  border
+                  border-gray-200
+                  bg-gray-50
+                  outline-none
+                  resize-none
+                  focus:border-green-500
+                  focus:ring-4
+                  focus:ring-green-100
+                  transition-all
+                  duration-200
+                "
+              />
+            </div>
+          </div>
+
+          {/* BUTTONS */}
+          <div className="flex flex-col sm:flex-row gap-4 mt-8">
+            <button
+              onClick={handleCheckout}
+              className="
+                flex-1
+                py-4
+                rounded-2xl
+                bg-green-600
+                hover:bg-green-700
+                text-white
+                font-semibold
+                transition-all
+                duration-300
+                shadow-lg
+                hover:shadow-xl
+              "
+            >
+              Xác nhận thanh toán
+            </button>
+
+            <button
+              onClick={() => navigate('/')}
+              className="
+                flex-1
+                py-4
+                rounded-2xl
+                border
+                border-gray-200
+                bg-white
+                hover:bg-gray-50
+                text-gray-700
+                font-semibold
+                transition-all
+                duration-300
+              "
+            >
+              Quay về trang chủ
+            </button>
+          </div>
+        </div>
+
+        {/* RIGHT */}
+        <div
+          className="
+            bg-white
+            rounded-[32px]
+            shadow-xl
+            border
+            border-gray-100
+            p-8
+            md:p-10
+            h-fit
+          "
+        >
+          {/* TITLE */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-800">
+              Đơn hàng của bạn
+            </h2>
+
+            <p className="text-gray-500 mt-2">
+              {cartCount} sản phẩm trong giỏ hàng
+            </p>
+          </div>
+
+          {/* EMPTY */}
+          {cart.length === 0 ? (
+            <div
+              className="
+                bg-gray-50
+                border
+                border-gray-100
+                rounded-3xl
+                py-16
+                text-center
+              "
+            >
+              <h3 className="text-xl font-semibold text-gray-700">
+                Chưa có sản phẩm
+              </h3>
+
+              <p className="text-gray-400 mt-2">
+                Hãy thêm sản phẩm vào giỏ hàng
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* PRODUCTS */}
+              <div className="space-y-5">
+                {cart.map((item) => (
+                  <div
+                    key={item.id}
+                    className="
+                      flex
+                      gap-4
+                      p-4
+                      rounded-3xl
+                      bg-gray-50
+                      border
+                      border-gray-100
+                    "
+                  >
+                    {/* IMAGE */}
+                    <div
+                      className="
+                        w-24
+                        h-24
+                        rounded-2xl
+                        overflow-hidden
+                        bg-gray-100
+                        flex-shrink-0
+                      "
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="
+                          w-full
+                          h-full
+                          object-cover
+                        "
+                      />
+                    </div>
+
+                    {/* INFO */}
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {item.name}
+                      </h3>
+
+                      <p className="text-gray-500 mt-2">
+                        Số lượng: {item.quantity}
+                      </p>
+
+                      <p className="text-green-600 font-bold text-xl mt-3">
+                        {(
+                          item.price *
+                          item.quantity
+                        ).toLocaleString('vi-VN')}
+                        đ
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* TOTAL */}
+              <div
+                className="
+                  mt-8
+                  pt-6
+                  border-t
+                  border-dashed
+                  border-gray-300
+                "
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-semibold text-gray-700">
+                    Tổng thanh toán
+                  </span>
+
+                  <span className="text-3xl font-bold text-green-600">
+                    {cartTotal.toLocaleString('vi-VN')}đ
+                  </span>
+                </div>
+
+                <p className="text-sm text-gray-400 mt-3">
+                  Đã bao gồm toàn bộ chi phí vận chuyển
+                </p>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 };
+
 export default CheckoutPage;
