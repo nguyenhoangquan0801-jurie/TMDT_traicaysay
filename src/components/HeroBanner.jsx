@@ -2,67 +2,93 @@ import { Link } from 'react-router-dom';
 
 const HeroBanner = () => {
   return (
-    <div className="relative h-[600px] bg-cover bg-center flex items-center" 
-         style={{ 
-           backgroundImage: "url('https://source.unsplash.com/random/1920x1080/?fruit,dried')",
-           backgroundPosition: 'center'
-         }}>
-      
-      {/* Overlay tối */}
-      <div className="absolute inset-0 bg-black/40"></div>
+    <div
+      className="relative h-[650px] bg-cover bg-center flex items-center overflow-hidden"
+      style={{
+        backgroundImage:
+          "url('https://suckhoedoisong.qltns.mediacdn.vn/324455921873985536/2023/1/5/hoa-qua-kho-1672887194389642956447.jpg')",
+      }}
+    >
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
 
-      <div className="relative max-w-7xl mx-auto px-6 text-white z-10">
-        <div className="max-w-xl">
-          <h1 className="text-5xl md:text-6xl font-bold leading-tight mb-4">
-            Trái Cây Sấy<br />
-            <span className="text-green-400">Nguyên Chất - Không Phụ Gia</span>
-          </h1>
+      {/* Decorative blur blob */}
+      <div className="absolute -top-20 -left-20 w-96 h-96 bg-green-500/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-yellow-400/10 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Main Content */}
+      <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
+        <div className="max-w-2xl animate-fade-in">
           
-          <p className="text-xl mb-8 text-gray-100">
-            Sản phẩm từ nông trại sạch, sấy lạnh giữ trọn dinh dưỡng và hương vị tự nhiên
+          {/* Label tag */}
+          <div className="inline-block mb-4">
+            <span className="bg-green-500/20 border border-green-400/50 text-green-300 text-sm font-medium px-4 py-1.5 rounded-full backdrop-blur-sm tracking-wide uppercase">
+              Sản phẩm ngon như nhà trồng
+            </span>
+          </div>
+
+          {/* Heading */}
+          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-5 text-white drop-shadow-lg">
+            Trái Cây Sấy
+            <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-lime-300">
+              Nguyên Chất
+            </span>
+            <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-orange-400">
+              Không Phụ Gia
+            </span>
+          </h1>
+
+          {/* Subtext */}
+          <p className="text-lg md:text-xl text-gray-200 mb-1 leading-relaxed max-w-lg">
+            Sản phẩm từ{' '}
+            <span className="text-green-300 font-semibold">nông trại sạch</span>
+            , sấy lạnh công nghệ cao — giữ trọn{' '}
+            <span className="text-yellow-300 font-semibold">dinh dưỡng</span> và
+            hương vị tự nhiên.
           </p>
 
-          <div className="flex gap-4">
-            <Link 
-              to="#sanpham" 
-              className="btn-primary text-lg px-10 py-4 rounded-2xl"
+          {/* CTA Buttons */}
+          <div className="flex flex-wrap gap-4">
+            <Link
+              to="#sanpham"
+              className="bg-green-500 hover:bg-green-400 active:scale-95 text-white font-bold text-lg px-10 py-4 rounded-2xl shadow-lg shadow-green-700/40 transition-all duration-200"
             >
               Mua Ngay
             </Link>
-            <Link 
-              to="#" 
-              className="border-2 border-white hover:bg-white hover:text-black text-lg px-8 py-4 rounded-2xl transition"
+            <Link
+              to="#gioi-thieu"
+              className="border-2 border-white/70 hover:border-white hover:bg-white hover:text-gray-900 text-white font-semibold text-lg px-8 py-4 rounded-2xl backdrop-blur-sm transition-all duration-200 active:scale-95"
             >
-              Xem Thêm
+              Tìm Hiểu Thêm
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Trust badges - Đã sửa theo yêu cầu */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex gap-6">
-        <div className="bg-white/95 text-gray-800 px-8 py-4 rounded-2xl flex items-center gap-3 shadow-lg">
-          <span className="text-2xl"></span>
-          <div>
-            <p className="font-semibold">100% Tự Nhiên</p>
-            <p className="text-sm text-gray-600">Không chất bảo quản</p>
+      {/* Trust Badges */}
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-full max-w-4xl px-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          
+          {/* Badge 1 */}
+          <div className="bg-white/90 backdrop-blur-md text-gray-800 px-6 py-4 rounded-2xl shadow-xl border border-white/60 flex flex-col gap-1 hover:bg-white transition-all duration-200">
+            <p className="font-bold text-green-700 text-base">100% Tự Nhiên</p>
+            <p className="text-sm text-gray-500">Không chất bảo quản, không phụ gia</p>
           </div>
-        </div>
 
-        <div className="bg-white/95 text-gray-800 px-8 py-4 rounded-2xl flex items-center gap-3 shadow-lg">
-          <span className="text-2xl"></span>
-          <div>
-            <p className="font-semibold">Công Nghệ Sấy Lạnh</p>
-            <p className="text-sm text-gray-600">Giữ nguyên dinh dưỡng</p>
+          {/* Badge 2 */}
+          <div className="bg-white/90 backdrop-blur-md text-gray-800 px-6 py-4 rounded-2xl shadow-xl border border-white/60 flex flex-col gap-1 hover:bg-white transition-all duration-200">
+            <p className="font-bold text-green-700 text-base">Công Nghệ Sấy Lạnh</p>
+            <p className="text-sm text-gray-500">Giữ nguyên vitamin & khoáng chất</p>
           </div>
-        </div>
 
-        <div className="bg-white/95 text-gray-800 px-8 py-4 rounded-2xl flex items-center gap-3 shadow-lg">
-          <span className="text-2xl"></span>
-          <div>
-            <p className="font-semibold">Giao Hàng Toàn Quốc</p>
-            <p className="text-sm text-gray-600">Miễn phí từ 500.000đ</p>
+          {/* Badge 3 */}
+          <div className="bg-white/90 backdrop-blur-md text-gray-800 px-6 py-4 rounded-2xl shadow-xl border border-white/60 flex flex-col gap-1 hover:bg-white transition-all duration-200">
+            <p className="font-bold text-green-700 text-base">Giao Hàng Toàn Quốc</p>
+            <p className="text-sm text-gray-500">Miễn phí vận chuyển từ 500.000đ</p>
           </div>
+
         </div>
       </div>
     </div>
