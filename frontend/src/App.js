@@ -34,6 +34,12 @@ import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 
 // =========================
+// SELLER PAGES
+// =========================
+import SellerLayout from './sellerPage/layouts/seller';
+import SellerDashboard from './sellerPage/pages/sellerDash';
+
+// =========================
 // ROUTE PROTECTION
 // =========================
 import PrivateRoute from './routes/PrivateRoute';
@@ -134,86 +140,49 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <BrowserRouter>
-          {/* APP LAYOUT */}
-          <div
-            className="
-              min-h-screen
-              bg-gray-50
-              text-gray-800
-            "
-          >
-            {/* HEADER */}
-            <Navbar />
+          <Routes>
+            {/*route của seller*/}
+            <Route path="/seller" element={<SellerLayout />}>
+              <Route index element={<SellerDashboard />} />
+              <Route path="dashboard" element={<SellerDashboard />} />
+            </Route>
 
-            {/* CART DRAWER */}
-            <Cart />
+            {/* route còn lại */}
+            <Route
+              path="*"
+              element={
+                <div className="min-h-screen bg-gray-50 text-gray-800">
+                  <Navbar />
+                  <Cart />
+                  <main>
+                    <Routes>
+                      {/* PUBLIC ROUTES */}
+                      <Route path="/" element={<Home />} />
+                      <Route path="/products" element={<ProductsPage />} />
+                      <Route path="/product/:id" element={<ProductDetail />} />
+                      <Route path="/checkout" element={<CheckoutPage />} />
+                      <Route path="/about" element={<AboutPage />} />
+                      <Route path="/contact" element={<ContactPage />} />
 
-            {/* ROUTES */}
-            <main>
-              <Routes>
-                {/* ========================= */}
-                {/* PUBLIC ROUTES */}
-                {/* ========================= */}
+                      {/* ADMIN ROUTES */}
+                      <Route path="/admin/login" element={<AdminLogin />} />
+                      <Route
+                        path="/admin"
+                        element={
+                          <PrivateRoute>
+                            <AdminDashboard />
+                          </PrivateRoute>
+                        }
+                      />
 
-                <Route
-                  path="/"
-                  element={<Home />}
-                />
-
-                <Route
-                  path="/products"
-                  element={<ProductsPage />}
-                />
-
-                <Route
-                  path="/product/:id"
-                  element={<ProductDetail />}
-                />
-
-                <Route
-                  path="/checkout"
-                  element={<CheckoutPage />}
-                />
-
-                <Route
-                  path="/about"
-                  element={<AboutPage />}
-                />
-
-                <Route
-                  path="/contact"
-                  element={<ContactPage />}
-                />
-
-                {/* ========================= */}
-                {/* ADMIN ROUTES */}
-                {/* ========================= */}
-
-                <Route
-                  path="/admin/login"
-                  element={<AdminLogin />}
-                />
-
-                <Route
-                  path="/admin"
-                  element={
-                    <PrivateRoute>
-                      <AdminDashboard />
-                    </PrivateRoute>
-                  }
-                />
-
-                {/* ========================= */}
-                {/* 404 PAGE */}
-                {/* ========================= */}
-
-                <Route
-                  path="*"
-                  element={<NotFoundPage />}
-                />
-              </Routes>
-            </main>
-          </div>
+                      {/* 404 PAGE */}
+                      <Route path="*" element={<NotFoundPage />} />
+                    </Routes>
+                  </main>
+                </div>
+              }
+            />
+          </Routes>
         </BrowserRouter>
       </CartProvider>
     </AuthProvider>
