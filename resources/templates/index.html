@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nonglamfood - Trái cây sấy</title>
+    <!-- Nhúng Font Awesome để hiển thị icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+    <style>
+        /* --- 1. BIẾN CHỦ ĐẠO (Tập trung một chỗ) --- */
+:root {
+    --primary-green: #008a45;
+    --dark-green: #38761d;
+    --light-green-bg: #84c48c;
+    --text-gray: #666;
+    --text-dark: #333;
+    --bg-light: #f5f5f5;
+    --accent-yellow: #e9ab17;
+}
+
+/* --- 2. THIẾT LẬP CHUNG (Global) --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    color: var(--text-dark);
+}
+
+ul { list-style: none; padding: 0; margin: 0; }
+a { text-decoration: none; transition: 0.3s; }
+
+/* --- 3. HEADER & SEARCH (Hợp nhất từ 2 phiên bản) --- */
+.nonglam-header {
+    background-color: var(--primary-green);
+    color: white;
+    width: 100%;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5%;
+}
+
+.logo img {
+    height: 60px;
+    /* filter: brightness(0) invert(1); Bật nếu muốn logo trắng */
+}
+
+/* Thanh tìm kiếm trung tâm */
+.search-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    margin: 0 30px;
+}
+
+.search-box {
+    display: flex;
+    background: white;
+    border-radius: 30px;
+    width: 100%;
+    max-width: 500px;
+    height: 45px;
+    overflow: hidden;
+}
+
+.search-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 0 20px;
+    font-size: 14px;
+}
+
+.search-btn {
+    background-color: var(--light-green-bg);
+    border: none;
+    width: 70px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-btn:hover { background-color: #6fb178; }
+
+/* Header Actions (Giỏ hàng, Tài khoản) */
+.header-actions { display: flex; gap: 20px; }
+.action-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 13px;
+    cursor: pointer;
+    color: white;
+}
+
+.cart { position: relative; }
+.cart-count {
+    position: absolute;
+    top: -5px;
+    right: 5px;
+    background: var(--accent-yellow);
+    color: white;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 50%;
+}
+
+/* Navigation Bar */
+.main-nav {
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding: 10px 5%;
+}
+
+.main-nav ul {
+    display: flex;
+    gap: 30px;
+}
+
+.main-nav ul li a {
+    color: white;
+    font-weight: 500;
+    font-size: 15px;
+    text-transform: uppercase;
+}
+
+/* --- 4. BỐ CỤC CHÍNH (Layout) --- */
+.container { display: flex; padding: 20px 5%; gap: 30px; }
+
+/* Sidebar */
+.sidebar { width: 25%; min-width: 280px; }
+
+.category-menu li { border-bottom: 1px solid #f0f0f0; }
+.category-menu li a {
+    display: flex;
+    align-items: center;
+    color: var(--text-dark);
+    padding: 12px 5px;
+    font-weight: bold;
+    font-size: 14px;
+}
+.category-menu li a:hover { color: var(--primary-green); }
+
+.menu-icon { width: 24px; height: 24px; margin-right: 15px; object-fit: contain; }
+
+/* Hotline & Info Box trong Sidebar */
+.info-box {
+    background-color: #fff9e6;
+    padding: 15px;
+    border: 1px dashed #ffcc00;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.hotline-card {
+    border: 2px solid var(--primary-green);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.phone-number, .hotline-text {
+    color: var(--primary-green);
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Right Content */
+.content-right { width: 75%; }
+
+/* --- 5. COMPONENT (Voucher, Sản phẩm, Tin tức) --- */
+
+/* Voucher */
+.voucher-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    background-color: var(--bg-light);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.voucher-item {
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.btn-copy {
+    border: 1px solid var(--primary-green);
+    color: var(--primary-green);
+    background: white;
+    padding: 5px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* Product Section */
+.section-title {
+    background-color: var(--primary-green);
+    color: white;
+    padding: 10px 15px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.product-grid-right {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.product-card {
+    border: 1px solid #eee;
+    padding: 15px;
+    position: relative;
+    text-align: center;
+}
+
+.product-card:hover { box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.product-card img { width: 100%; height: auto; object-fit: contain; }
+
+.old-price { text-decoration: line-through; color: #999; font-size: 0.8em; }
+.discount-percent { color: red; font-size: 0.8em; }
+
+/* Dịch vụ khách hàng (3 cột) */
+.services-grid {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 20px 0;
+    border-top: 1px solid #f0f0f0;
+}
+
+.services-flex-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.service-item { display: flex; align-items: center; gap: 15px; font-weight: 500; }
+.service-icon { width: 50px; height: 50px; object-fit: contain; }
+
+/* --- 6. FOOTER --- */
+/* Tổng quan Footer */
+.footer-section {
+    background-color: #f9f9f9;
+    border-top: 1px solid #eee;
+}
+
+/* Newsletter Bar - Sửa lỗi lệch hàng */
+.newsletter-bar {
+    background-color: #333;
+    padding: 20px 0;
+    color: white;
+}
+
+.newsletter-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.social-icons {
+    display: flex;
+    gap: 15px;
+    font-size: 24px;
+}
+
+.social-icons a {
+    color: white;
+    transition: color 0.3s;
+}
+
+.social-icons a:hover {
+    color: #008a45;
+}
+
+.subscribe-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.subscribe-label {
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* Sửa lỗi ô input và nút đăng ký dính liền */
+.input-group {
+    display: flex;
+    background-color: white;
+    border-radius: 30px;
+    overflow: hidden;
+    min-width: 350px;
+}
+
+.input-group input {
+    flex: 1;
+    border: none;
+    padding: 10px 20px;
+    outline: none;
+}
+
+.input-group button {
+    background-color: #008a45;
+    color: white;
+    border: none;
+    padding: 0 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.input-group button:hover {
+    background-color: #006b35;
+}
+
+/* Main Footer Grid */
+.main-footer {
+    padding: 50px 0;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+}
+
+.footer-column h4 {
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.footer-column h4::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 40px;
+    height: 2px;
+    background-color: #008a45;
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-column ul li {
+    margin-bottom: 10px;
+}
+
+.footer-column ul li a {
+    text-decoration: none;
+    color: #666;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.footer-column ul li a:hover {
+    color: #008a45;
+    padding-left: 5px;
+}
+
+.footer-info p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.hotline-big {
+    color: #008a45;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.work-time {
+    font-size: 13px;
+    color: #999;
+}
+
+.payment-img {
+    max-width: 200px;
+    margin-top: 10px;
+}
+
+.footer-bottom {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #eee;
+    font-size: 13px;
+    color: #777;
+}
+
+/* Responsive cho Mobile */
+@media (max-width: 768px) {
+    .newsletter-wrapper {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .subscribe-container {
+        justify-content: center;
+    }
+    
+    .input-group {
+        min-width: 100%;
+    }
+}
+
+/* --- 7. RESPONSIVE --- */
+@media (max-width: 768px) {
+    .container, .header-top, .main-nav ul, .services-grid, .main-footer, .newsletter-bar {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .sidebar, .content-right { width: 100%; }
+    .search-wrapper { margin: 20px 0; width: 100%; }
+    .product-grid, .voucher-grid { grid-template-columns: repeat(2, 1fr); }
+    .main-footer { grid-template-columns: 1fr; }
+    .services-flex-container { flex-direction: column; }
+}
+.news-section {
+    padding: 30px 0;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Thanh tiêu đề xanh lục */
+.news-header {
+    background-color: #008a45;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.news-header h3 {
+    margin: 0;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.title-icon {
+    width: 20px;
+    height: 20px;
+    filter: brightness(0) invert(1); /* Chuyển icon sang màu trắng nếu là ảnh tối */
+}
+
+/* Bố cục chia 2 cột */
+.news-content-wrapper {
+    display: flex;
+    gap: 30px;
+}
+
+.news-main {
+    flex: 1.2; /* Cột trái rộng hơn */
+}
+
+.news-sidebar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Tin lớn */
+.news-main-img img {
+    width: 80%;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+.news-title-large {
+    font-size: 20px;
+    margin: 15px 0 5px 0;
+    color: #333;
+}
+
+.news-meta {
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.news-excerpt {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.read-more {
+    color: #008a45;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Tin nhỏ bên phải */
+.news-item-small {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.news-item-small img {
+    width: 100px;
+    height: 67px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.small-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #333;
+    /* Giới hạn 2 dòng chữ */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.meta-small {
+    font-size: 12px;
+    color: #999;
+    margin: 0;
+}
+
+/* Nút xem tất cả */
+
+.view-all-news {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.btn-outline-green {
+    border: 1px solid #008a45;
+    color: #008a45;
+    padding: 5px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .news-content-wrapper {
+        flex-direction: column;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="nonglam-header" xmlns:th="http://www.thymeleaf.org">
+    <div class="header-top">
+        <div style="background-color: #008a45; padding: 20px;">
+            <img th:src="@{/assets/logo.png}" alt="Logo" style="height: 60px;">
+        </div>
+
+        <div class="search-wrapper">
+            <div class="search-box">
+                <input type="text" placeholder="Tìm kiếm sản phẩm...">
+                <button class="search-btn">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="header-actions">
+            <div class="action-item">
+                <i class="fa fa-file-text-o"></i>
+                <span>Đơn hàng</span>
+            </div>
+            <div class="action-item">
+                <i class="fa fa-map-marker"></i>
+                <span>Cửa hàng</span>
+            </div>
+
+            <div class="action-item" th:if="${userEmail == null}">
+                <a th:href="@{/login}" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; align-items: center;">
+                    <i class="fa fa-user-o"></i>
+                    <span style="font-weight: bold; color: #008a45;">Đăng nhập</span>
+                </a>
+            </div>
+
+            <div class="action-item" th:if="${userEmail != null}" style="position: relative; cursor: pointer;">
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <i class="fa fa-user" style="color: #008a45;"></i>
+                    <span th:text="${#strings.length(userEmail) > 15 ? #strings.substring(userEmail,0,15) + '...' : userEmail}" 
+                          style="font-size: 12px; color: #333; max-width: 110px; overflow: hidden; white-space: nowrap;">
+                          Email thành viên
+                    </span>
+                    <a th:href="@{/logout}" style="font-size: 11px; color: red; text-decoration: none; margin-top: 2px;">
+                        [Đăng xuất]
+                    </a>
+                </div>
+            </div>
+            
+            <div class="action-item cart">
+                <i class="fa fa-shopping-cart"></i>
+                <span class="cart-count">0</span>
+                <span>Giỏ hàng</span>
+            </div>
+        </div>
+    </div>
+
+    <nav class="main-nav">
+        <ul>
+            <li><a th:href="@{/#}">TRÁI CÂY SẤY</a></li>
+            <li><a th:href="@{/#}">TRÁI CÂY SẤY MÙA XUÂN</a></li>
+            <li><a th:href="@{/#}">TRÁI CÂY SẤY MÙA HÈ</a></li>
+            <li><a th:href="@{/#}">LIÊN HỆ</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="category-menu">
+            <!-- Mục danh mục sản phẩm -->
+            <ul>
+                <li>
+                    <a href="#">
+                        <img src="/src/main/resources/static/assets/allProducts.png" alt="icon" class="menu-icon"> 
+                        TẤT CẢ SẢN PHẨM
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <img src="/src/main/resources/static/assets/followSeason.png" alt="icon" class="menu-icon"> 
+                        TRÁI CÂY SẤY THEO MÙA
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <img src="/src/main/resources/static/assets/news.png" alt="icon" class="menu-icon"> 
+                        TIN TỨC | MẸO VẶT
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <!-- Dòng Giao hàng -->
+            <div class="info-item delivery">
+                <img src="/src/main/resources/static/assets/delivery.png" alt="icon" class="menu-icon">
+                <span class="text-delivery">Giao hàng đúng giờ</span>
+            </div>
+
+            <!-- Khung Gọi mua hàng -->
+            <div class="hotline-card">
+                <img src="/src/main/resources/static/assets/call.png" alt="icon" class="hotline-icon">
+                <div class="hotline-content">
+                    <p class="hotline-text">Gọi mua hàng: <span class="number">0901 956 070</span></p>
+                    <p class="working-time">(8:00 - 19:00 T2 - CN)</p>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+
+    <!-- Content Right -->
+    <section class="content-right">
+        <!-- Banner -->
+        <div class="banner-slider">
+            <img src="/src/main/resources/static/assets/banner.png" alt="Banner" style="width: 100%; border-radius: 8px;">
+        </div>
+
+        <!-- Voucher -->
+        <div class="section-container" style="margin-top: 20px;">
+            <div class="voucher-grid">
+                <div class="voucher-item">
+                    <h4 style="margin:0; font-size: 0.9em;">MÃ: NLF100</h4>
+                    <p style="font-size: 0.75em; color: #555;">Giảm 10k đơn từ 100k</p>
+                    <button class="btn-copy">Sao chép</button>
+                </div>
+                <div class="voucher-item">
+                    <h4 style="margin:0; font-size: 0.9em;">MÃ: NLF300</h4>
+                    <p style="font-size: 0.75em; color: #555;">Giảm 30k đơn từ 300k</p>
+                    <button class="btn-copy">Sao chép</button>
+                </div>
+                <div class="voucher-item">
+                    <h4 style="margin:0; font-size: 0.9em;">MÃ: NLF500</h4>
+                    <p style="font-size: 0.75em; color: #555;">Giảm 50k đơn từ 500k</p>
+                    <button class="btn-copy">Sao chép</button>
+                </div>
+                <div class="voucher-item">
+                    <h4 style="margin:0; font-size: 0.9em;">MÃ: FREE</h4>
+                    <p style="font-size: 0.75em; color: #555;">Freeship đơn từ 200k</p>
+                    <button class="btn-copy">Sao chép</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sản phẩm mới -->
+        <div class="section-container">
+            <div class="section-title">SẢN PHẨM MỚI</div>
+            <div class="product-grid">
+                <!-- Mẫu sản phẩm 1 -->
+                <div class="product-card">
+                    <img src="/src/main/resources/static/assets/vobuoisaydeo.png" alt="Sản phẩm">
+                    <h5 style="font-size: 0.9em; margin: 10px 0;">Vỏ bưởi sấy dẻo 100g</h5>
+                    <p style="color: red; font-weight: bold; margin: 5px 0;">45.000đ</p>
+                    <span class="old-price">55.000đ</span>
+                    <span class="discount-percent">-15%</span>
+                    <button style="position: absolute; bottom: 15px; right: 15px; background: var(--primary-green); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer;">+</button>
+                </div>
+                <!-- Mẫu sản phẩm 2 -->
+                <div class="product-card">
+                    <img src="/src/main/resources/static/assets/xoaisaydeo.png" alt="Sản phẩm">
+                    <h5 style="font-size: 0.9em; margin: 10px 0;">Xoài sấy dẻo thượng hạng</h5>
+                    <p style="color: red; font-weight: bold; margin: 5px 0;">65.000đ</p>
+                    <button style="position: absolute; bottom: 15px; right: 15px; background: var(--primary-green); color: white; border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer;">+</button>
+                </div>
+                <!-- ... các sản phẩm khác -->
+            </div>
+        </div>
+
+        <!-- Trái cây sấy Section -->
+        <div class="section-container" style="margin-top: 40px;">
+            <div class="section-title">TRÁI CÂY SẤY</div>
+            <div class="product-section-wrapper">
+                <div class="big-banner-left">
+                    <img src="https://via.placeholder.com/300x500?text=Promotion+Banner" style="width:100%; height:100%; object-fit: cover;" alt="KM">
+                </div>
+                <div class="product-grid-right">
+                    <div class="product-card">
+                        <span class="sold-out-badge">Hết hàng</span>
+                        <img src="/src/main/resources/static/assets/thomsaydeo.png" alt="SP">
+                        <h5 style="font-size: 0.85em;">Thơm sấy dẻo</h5>
+                        <p style="color: #008a45; font-weight: bold;">Liên hệ</p>
+                    </div>
+                    <div class="product-card">
+                        <img src="/src/main/resources/static/assets/chanhdaysaydeo.png" alt="SP">
+                        <h5 style="font-size: 0.85em;">Chanh dây sấy dẻo</h5>
+                        <p style="color: red; font-weight: bold;">50.000đ</p>
+                    </div>
+                    <div class="product-card">
+                        <img src="/src/main/resources/static/assets/dudusaydeo.png" alt="SP">
+                        <h5 style="font-size: 0.85em;">Đu đủ sấy dẻo</h5>
+                        <p style="color: red; font-weight: bold;">42.000đ</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+<section class="services-wrapper-bottom">
+    <div class="container">
+        <!-- Nút Xem tất cả nằm riêng một hàng -->
+        <div class="view-all-center">
+            <a href="#" class="btn-view-all">Xem tất cả</a>
+        </div>
+
+        <hr class="light-divider">
+
+        <!-- 3 Dịch vụ nằm ngang phía dưới -->
+        <div class="services-horizontal">
+            <div class="service-item-box">
+                <img src="assets/delivery.png" alt="Giao hàng" class="icon-img">
+                <span class="service-text">Giao hàng đúng giờ</span>
+            </div>
+
+            <div class="service-item-box">
+                <img src="assets/promotion.png" alt="Ưu đãi" class="icon-img">
+                <span class="service-text">Ưu đãi mỗi ngày</span>
+            </div>
+
+            <div class="service-item-box">
+                <img src="assets/exchange.png" alt="Đổi trả" class="icon-img">
+                <span class="service-text">Đổi trả trong vòng 7 ngày</span>
+            </div>
+        </div>
+    </div>
+</section>
+</main>
+
+<!-- Tin tức Section -->
+<section class="news-section">
+    <div class="container">
+        <!-- Tiêu đề với nền xanh lục -->
+        <div class="news-header">
+            <h3><img src="assets/news-icon.png" alt="" class="title-icon"> TIN TỨC</h3>
+        </div>
+
+        <div class="news-content-wrapper">
+            <!-- Tin chính bên trái -->
+            <div class="news-main">
+                <div class="news-main-img">
+                    <img src="assets/loi_ich_cua_trai_cay.jpg" alt="news">
+                </div>
+                <div class="news-main-info">
+                    <h3 class="news-title-large">Lợi ích của trái cây sấy dẻo đối với sức khỏe</h3>
+                    <p class="news-meta">Nonglamfood - 20/05/2024</p>
+                    <p class="news-excerpt">Trái cây sấy dẻo giữ được lượng vitamin và khoáng chất dồi dào, là món ăn vặt lành mạnh...</p>
+                    <a href="#" class="read-more">Đọc tiếp</a>
+                </div>
+            </div>
+
+            <!-- Danh sách tin nhỏ bên phải -->
+            <div class="news-sidebar">
+                <!-- Tin nhỏ 1 -->
+                <div class="news-item-small">
+                    <img src="assets/bao_quan_hat.png" alt="news">
+                    <div class="small-info">
+                        <h4>Hộp Quà Tết Cao Cấp 2026 | 10+ Mẫu Sang Trọng...</h4>
+                        <p class="meta-small">Marketing - 26/11/2025</p>
+                    </div>
+                </div>
+
+                <!-- Tin nhỏ 2 -->
+                <div class="news-item-small">
+                    <img src="assets/lam_banh_trai_cay_kho.jpg" alt="news">
+                    <div class="small-info">
+                        <h4>Hạt Sacha Inchi Có Tác Dụng Gì? 10 Lợi Ích...</h4>
+                        <p class="meta-small">Marketing - 25/11/2025</p>
+                    </div>
+                </div>
+
+                <!-- Tin nhỏ 3 -->
+                <div class="news-item-small">
+                    <img src="assets/trai_cay_say_nong_lam.jpg" alt="news">
+                    <div class="small-info">
+                        <h4>Trái Cây Sấy Nông Lâm Food - Ngon Chuẩn Vị...</h4>
+                        <p class="meta-small">Mua hàng - 21/11/2025</p>
+                    </div>
+                </div>
+                
+                <div class="view-all-news">
+                    <a href="#" class="btn-outline-green">Xem tất cả</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="footer-section">
+    <!-- Thanh đăng ký nhận tin (Newsletter Bar) -->
+    <div class="newsletter-bar">
+        <div class="container newsletter-wrapper">
+            <!-- Mạng xã hội -->
+            <div class="social-icons">
+                <a href="#"><i class="fa fa-facebook-official"></i></a>
+                <a href="#"><i class="fa fa-instagram"></i></a>
+                <a href="#"><i class="fa fa-youtube-play"></i></a>
+            </div>
+
+            <!-- Form đăng ký -->
+            <div class="subscribe-container">
+                <span class="subscribe-label">Đăng ký nhận ưu đãi ngay:</span>
+                <form class="subscribe-form">
+                    <div class="input-group">
+                        <input type="email" placeholder="Nhập email của bạn..." required>
+                        <button type="submit">Đăng ký</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nội dung chính của Footer -->
+    <div class="container main-footer">
+        <div class="footer-grid">
+            <!-- Cột 1: Địa chỉ -->
+            <div class="footer-column">
+                <h4>ĐỊA CHỈ</h4>
+                <div class="footer-info">
+                    <p><i class="fa fa-map-marker"></i> 311-G9 Đường số 8, Phường Bình Trưng Đông, TP. Thủ Đức</p>
+                    <p><i class="fa fa-phone"></i> Hotline: 0901 956 070</p>
+                    <p><i class="fa fa-envelope"></i> Email: info@nonglamfood.com</p>
+                </div>
+            </div>
+
+            <!-- Cột 2: Thông tin -->
+            <div class="footer-column">
+                <h4>THÔNG TIN</h4>
+                <ul>
+                    <li><a href="#">Về chúng tôi</a></li>
+                    <li><a href="#">Sản phẩm</a></li>
+                    <li><a href="#">Tin tức & Mẹo vặt</a></li>
+                    <li><a href="#">Hệ thống cửa hàng</a></li>
+                </ul>
+            </div>
+
+            <!-- Cột 3: Hỗ trợ -->
+            <div class="footer-column">
+                <h4>HỖ TRỢ KHÁCH HÀNG</h4>
+                <ul>
+                    <li><a href="#">Chính sách đổi trả</a></li>
+                    <li><a href="#">Chính sách bảo mật</a></li>
+                    <li><a href="#">Điều khoản dịch vụ</a></li>
+                    <li><a href="#">Câu hỏi thường gặp</a></li>
+                </ul>
+            </div>
+
+            <!-- Cột 4: Tổng đài & Thanh toán -->
+            <div class="footer-column">
+                <h4>TỔNG ĐÀI HỖ TRỢ</h4>
+                <p class="hotline-big">0901 956 070</p>
+                <p class="work-time">(8:00 - 19:00 T2 - CN)</p>
+                <h4 style="margin-top: 20px;">PHƯƠNG THỨC THANH TOÁN</h4>
+                <img src="assets/payment-methods.png" class="payment-img" alt="Thanh toán">
+            </div>
+        </div>
+    </div>
+
+    <!-- Bản quyền -->
+    <div class="footer-bottom">
+        <p>&copy; 2026 Nonglamfood - Lưu giữ hương vị thiên nhiên.</p>
+    </div>
+</footer>
+
+</body>
+</html>>
