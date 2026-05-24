@@ -38,6 +38,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 // =========================
 import SellerLayout from './sellerPage/layouts/seller';
 import SellerDashboard from './sellerPage/pages/sellerDash';
+import SellerProducts from './sellerPage/pages/sellerProducts';
 
 // =========================
 // ROUTE PROTECTION
@@ -145,6 +146,7 @@ function App() {
             <Route path="/seller" element={<SellerLayout />}>
               <Route index element={<SellerDashboard />} />
               <Route path="dashboard" element={<SellerDashboard />} />
+              <Route path="products" element={<SellerProducts />} />
             </Route>
 
             {/* route còn lại */}
