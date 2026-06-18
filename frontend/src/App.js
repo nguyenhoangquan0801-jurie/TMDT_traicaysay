@@ -12,10 +12,11 @@ import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
 
 // =========================
-// LAYOUT COMPONENTS
+// LAYOUT COMPONENTS & UTILS
 // =========================
 import Navbar from './components/Navbar';
 import Cart from './components/Cart';
+import ScrollToTop from './components/ScrollToTop'; // 🚀 Đã thêm dòng import này cho bạn
 
 // =========================
 // PUBLIC PAGES
@@ -141,8 +142,12 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <BrowserRouter>
+          
+          {/* 🚀 TỰ ĐỘNG CUỘN LÊN ĐẦU TRANG KHI ĐỔI ROUTE */}
+          <ScrollToTop />
+
           <Routes>
-            {/*route của seller*/}
+            {/* route của seller */}
             <Route path="/seller" element={<SellerLayout />}>
               <Route index element={<SellerDashboard />} />
               <Route path="dashboard" element={<SellerDashboard />} />
