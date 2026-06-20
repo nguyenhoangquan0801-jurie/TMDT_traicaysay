@@ -6,23 +6,13 @@ import {
   useState,
 } from 'react';
 
-// =========================
-// CREATE CONTEXT
-// =========================
 const CartContext = createContext(null);
 
-// =========================
-// PROVIDER
-// =========================
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
 
-  // Loading state
   const [loading, setLoading] = useState(true);
 
-  // =========================
-  // LOAD CART
-  // =========================
   useEffect(() => {
     try {
       const savedCart = localStorage.getItem('cart');
@@ -45,8 +35,8 @@ export const CartProvider = ({ children }) => {
     }
   }, [cart, loading]);
 
-  // ADD TO CART
-  const addToCart = (product) => {
+  // Thêm tham số `amount` và mặc định bằng 1 nếu không truyền vào
+  const addToCart = (product, amount = 1) => {
     if (!product || !product.id) {
       console.error('Sản phẩm không hợp lệ');
       return;
@@ -57,24 +47,24 @@ export const CartProvider = ({ children }) => {
         (item) => item.id === product.id
       );
 
-      // Nếu đã tồn tại -> tăng số lượng
+      // Nếu đã tồn tại -> cộng dồn với số lượng thực tế được truyền vào
       if (existingProduct) {
         return prevCart.map((item) =>
           item.id === product.id
             ? {
-                ...item,
-                quantity: item.quantity + 1,
-              }
+              ...item,
+              quantity: item.quantity + amount,
+            }
             : item
         );
       }
 
-      // Nếu chưa tồn tại -> thêm mới
+      // Nếu chưa tồn tại -> thêm mới với số lượng thực tế được truyền vào
       return [
         ...prevCart,
         {
           ...product,
-          quantity: 1,
+          quantity: amount,
         },
       ];
     });
@@ -99,9 +89,9 @@ export const CartProvider = ({ children }) => {
       prevCart.map((item) =>
         item.id === id
           ? {
-              ...item,
-              quantity,
-            }
+            ...item,
+            quantity,
+          }
           : item
       )
     );
@@ -113,9 +103,9 @@ export const CartProvider = ({ children }) => {
       prevCart.map((item) =>
         item.id === id
           ? {
-              ...item,
-              quantity: item.quantity + 1,
-            }
+            ...item,
+            quantity: item.quantity + 1,
+          }
           : item
       )
     );
@@ -128,9 +118,9 @@ export const CartProvider = ({ children }) => {
         .map((item) =>
           item.id === id
             ? {
-                ...item,
-                quantity: item.quantity - 1,
-              }
+              ...item,
+              quantity: item.quantity - 1,
+            }
             : item
         )
         .filter((item) => item.quantity > 0)
@@ -153,13 +143,9 @@ export const CartProvider = ({ children }) => {
 
   // TOTAL COUNT
   const cartCount = useMemo(() => {
-    return cart.reduce(
-      (total, item) => total + item.quantity,
-      0
-    );
+    return cart.length;
   }, [cart]);
 
-  // CONTEXT VALUE
   const value = useMemo(
     () => ({
       cart,
@@ -200,7 +186,5 @@ export const useCart = () => {
   return context;
 };
 
-// EXPORT
 export { CartContext };
-
 export default CartContext;

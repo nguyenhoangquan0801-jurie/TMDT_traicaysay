@@ -1,8 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-
-// Đọc chính xác file data thực tế 50 sản phẩm của nhóm
+import { useLocation, Link } from 'react-router-dom';  
 import { products } from '../data/mockProducts';
+import { useCart } from '../context/CartContext';
 
 const categories = [
   { label: 'Tất cả sản phẩm', value: 'all' },
@@ -12,12 +11,15 @@ const categories = [
 
 const ProductsPage = () => {
   const location = useLocation();
+  
+  // Lấy hàm xử lý thêm sản phẩm vào giỏ hàng từ context ra sử dụng
+  const { addToCart } = useCart();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortOption, setSortOption] = useState('default');
 
-  // Logic đếm ngược cho phần Flash Sale của nhóm
+  // Logic đếm ngược cho phần Flash Sale 
   const [timeLeft, setTimeLeft] = useState({ hours: 3, minutes: 45, seconds: 20 });
 
   useEffect(() => {
@@ -37,8 +39,7 @@ const ProductsPage = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-
-  // ĐỒNG BỘ DỮ LIỆU TỪ TRANG CHỦ (HOME) SANG TRANG SẢN PHẨM KHÔNG LO LỖI TRỐNG TRANG
+  
   useEffect(() => {
     if (location.state) {
       if (location.state.categoryFilter) {
@@ -51,15 +52,12 @@ const ProductsPage = () => {
       }
     }
   }, [location.state]);
-
-  // 🛠️ ĐÃ SỬA: ĐỒNG BỘ LOGIC LỌC KHỚP 100% VỚI TRANG CHỦ ĐỂ HIỆN ĐỦ 15 MÓN ĐẶC SẢN
+ 
   const filteredProducts = useMemo(() => {
     return products
       .filter((p) => {
         const sKeyword = searchTerm.toLowerCase().trim();
-
-        // 1. Nếu người dùng click vào "Đặc Sản Vùng Miền" từ trang chủ (truyền keyword 'đặc sản')
-        // Giao diện sẽ áp dụng bộ lọc đặc sản vùng miền chuẩn (tìm theo tỉnh thành giống trang chủ)
+ 
         if (sKeyword === 'đặc sản') {
           const isSpecialRegion = ['bắc giang', 'đà lạt', 'tiền giang', 'bến tre', 'đồng tháp', 'huế', 'đặc sản'].some(prov => 
             p.origin?.toLowerCase().includes(prov) || 
@@ -68,12 +66,12 @@ const ProductsPage = () => {
           );
           if (!isSpecialRegion) return false;
         } 
-        // 2. Nếu người dùng click vào "Hoa Quả Sấy Giòn" từ trang chủ (truyền keyword 'giòn')
+         
         else if (sKeyword === 'giòn') {
           const isCrisp = p.name?.toLowerCase().includes('giòn') || p.tag?.toLowerCase().includes('giòn');
           if (!isCrisp) return false;
         }
-        // 3. Nếu là tìm kiếm thông thường nhập bằng tay từ ô Input bên dưới
+         
         else if (sKeyword !== '') {
           const matchSearch = p.name?.toLowerCase().includes(sKeyword) ||
                               p.origin?.toLowerCase().includes(sKeyword) ||
@@ -81,10 +79,10 @@ const ProductsPage = () => {
           if (!matchSearch) return false;
         }
 
-        // Lọc kết hợp thêm theo Tab Danh Mục (nếu có chọn phía dưới)
+        // Lọc kết hợp thêm theo Tab Danh Mục  
         let matchCategory = true;
         if (selectedCategory === 'trai-cay-say') {
-          // Bao gồm các món thuộc nhóm trai-cay-say hoặc có chữ dẻo/khô như trang chủ
+           
           matchCategory = p.category === 'trai-cay-say' || 
                           p.name?.toLowerCase().includes('dẻo') || 
                           p.name?.toLowerCase().includes('khô');
@@ -103,19 +101,18 @@ const ProductsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
-      
-      {/* CHỈ HIỂN THỊ BANNER NẾU LÀ FLASH SALE */}
+       
       {selectedCategory === 'flash-sale' && (
         <div className="bg-gradient-to-r from-red-600 to-orange-500 py-12 text-white shadow-md">
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-3xl">⚡</span>
+                
                 <h1 className="text-4xl font-black uppercase tracking-tight">Flash Sale Giờ Vàng</h1>
               </div>
               <p className="text-red-100 mt-1">Săn deal chớp nhoáng - Ưu đãi ngập tràn cùng Nông Lâm Store!</p>
             </div>
-            {/* Countdown widget */}
+             
             <div className="flex items-center gap-2 font-bold text-xl bg-black/20 px-4 py-3 rounded-2xl border border-white/10">
               <span className="text-xs font-semibold text-red-100 uppercase tracking-wider mr-1">Kết thúc sau:</span>
               <span className="bg-white text-red-600 px-2.5 py-1.5 rounded-lg">{String(timeLeft.hours).padStart(2, '0')}</span>
@@ -128,7 +125,6 @@ const ProductsPage = () => {
         </div>
       )}
 
-      {/* KHU VỰC THANH BỘ LỌC TÌM KIẾM TÍNH NĂNG CAO */}
       <div className="max-w-7xl mx-auto px-6 mt-10">
         <div className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -160,8 +156,8 @@ const ProductsPage = () => {
                 className="w-full h-12 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm"
               >
                 <option value="default">Mặc định</option>
-                <option value="price-low">Giá: Thấp đến Cao</option>
-                <option value="price-high">Giá: Cao đến Thấp</option>
+                <option value="price-low">Thấp đến Cao</option>
+                <option value="price-high">Cao đến Thấp</option>
               </select>
             </div>
           </div>
@@ -173,7 +169,7 @@ const ProductsPage = () => {
                 key={i}
                 onClick={() => {
                   setSelectedCategory(c.value);
-                  // Khi bấm tab đổi danh mục bằng tay thì xóa keyword tìm kiếm từ trang chủ để tránh xung đột
+                  
                   setSearchTerm('');
                 }}
                 className={`px-4 py-2 rounded-xl font-bold text-xs transition-all ${
@@ -187,15 +183,7 @@ const ProductsPage = () => {
             ))}
           </div>
         </div>
-
-        {/* TIÊU ĐỀ SỐ LƯỢNG */}
-        <div className="mt-8 mb-6">
-          <p className="text-sm text-gray-500">
-            Tìm thấy <span className="font-bold text-green-600">{filteredProducts.length}</span> món ăn sạch chất lượng cao phù hợp.
-          </p>
-        </div>
-
-        {/* GRID HIỂN THỊ SẢN PHẨM KHỚP DATA MOCKPRODUCTS CỦA NHÓM */}
+ 
         {filteredProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredProducts.map((p) => {
@@ -209,9 +197,10 @@ const ProductsPage = () => {
 
               return (
                 <div key={p.id} className="bg-white rounded-2xl border border-gray-200 p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative">
-                  <div>
+                   
+                  <Link to={`/product/${p.id}`} className="group block cursor-pointer">
                     <div className="w-full aspect-square bg-gray-50 rounded-xl overflow-hidden mb-3 relative">
-                      <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                      <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                       {hasSale && (
                         <span className="absolute top-2 right-2 bg-red-600 text-white font-black text-[10px] px-2 py-0.5 rounded">
                           -{salePercent}% OFF
@@ -223,13 +212,13 @@ const ProductsPage = () => {
                         </span>
                       )}
                     </div>
-                    <h3 className="font-bold text-gray-900 text-sm line-clamp-2 min-h-[2.5rem]">
+                    <h3 className="font-bold text-gray-900 text-sm line-clamp-2 min-h-[2.5rem] group-hover:text-green-600 transition-colors">
                       {p.name}
                     </h3>
                     {p.origin && (
                       <p className="text-[11px] text-gray-400 mt-0.5">Xuất xứ: {p.origin}</p>
                     )}
-                  </div>
+                  </Link>
 
                   <div className="mt-4">
                     <div className="flex items-baseline gap-2">
@@ -242,24 +231,11 @@ const ProductsPage = () => {
                         </span>
                       )}
                     </div>
-
-                    {/* THANH PROGRESS BAR SỐ LƯỢNG ĐÃ BÁN FLASH SALE */}
-                    {selectedCategory === 'flash-sale' && (
-                      <div className="mt-2.5">
-                        <div className="w-full bg-gray-100 rounded-full h-4 relative overflow-hidden border border-gray-200 flex items-center justify-center">
-                          <div 
-                            className="h-full absolute left-0 top-0 bg-gradient-to-r from-orange-500 to-red-600 transition-all duration-300"
-                            style={{ width: `${progressWidth}%` }}
-                          ></div>
-                          <span className="absolute text-[9px] font-black text-gray-700 z-10 uppercase flex items-center gap-1">
-                            🔥 Đã bán {fakeSold}/{fakeStock}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* NÚT THÊM VÀO GIỎ XANH LÁ CHUẨN */}
-                    <button className="w-full mt-3 py-2 rounded-xl bg-green-600 text-white font-bold text-xs hover:bg-green-700 transition-colors shadow-sm">
+ 
+                    <button 
+                      onClick={() => addToCart(p)}
+                      className="w-full mt-3 py-2 rounded-xl bg-green-600 text-white font-bold text-xs hover:bg-green-700 transition-colors shadow-sm cursor-pointer"
+                    >
                       Thêm vào giỏ
                     </button>
                   </div>

@@ -213,7 +213,7 @@ const Home = () => {
             <div className="flex items-center gap-3">
               <div>
                 <h2 className="text-2xl md:text-3xl font-black text-red-600 uppercase tracking-tight">Flash Sale Giờ Vàng</h2>
-                <p className="text-xs text-gray-500 mt-0.5">Ưu đãi giới hạn, làm mới sau mỗi khung giờ!</p>
+                {/* <p className="text-xs text-gray-500 mt-0.5">Ưu đãi giới hạn, làm mới sau mỗi khung giờ!</p> */}
               </div>
             </div>
             
