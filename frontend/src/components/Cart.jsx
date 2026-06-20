@@ -11,9 +11,9 @@ const Cart = () => {
     const [isAnimating, setIsAnimating] = useState(false);
     const [removingId, setRemovingId] = useState(null);
 
-    // Total quantity (not just unique items)
-    const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-
+    // Total quantity 
+    const totalItems = cart.length;
+    
     // Open with animation
     const handleOpenCart = useCallback(() => {
         setIsOpen(true);
