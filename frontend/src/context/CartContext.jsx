@@ -1,15 +1,11 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, } from 'react';
 
 const CartContext = createContext(null);
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
+  // State lưu danh sách đơn hàng động
+  const [orders, setOrders] = useState([]);
 
   const [loading, setLoading] = useState(true);
 
@@ -20,20 +16,29 @@ export const CartProvider = ({ children }) => {
       if (savedCart) {
         setCart(JSON.parse(savedCart));
       }
+
+      // Tải đơn hàng cũ từ localStorage 
+      const savedOrders = localStorage.getItem('orders');
+      if (savedOrders) {
+        setOrders(JSON.parse(savedOrders));
+      }
     } catch (error) {
-      console.error('Lỗi đọc giỏ hàng:', error);
+      console.error('Lỗi đọc dữ liệu:', error);
       localStorage.removeItem('cart');
+      localStorage.removeItem('orders');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // SAVE CART
+  // SAVE CART & ORDERS
   useEffect(() => {
     if (!loading) {
       localStorage.setItem('cart', JSON.stringify(cart));
+      // Tự động lưu danh sách đơn hàng vào localStorage khi có đơn mới
+      localStorage.setItem('orders', JSON.stringify(orders));
     }
-  }, [cart, loading]);
+  }, [cart, orders, loading]); // Theo dõi biến orders 
 
   // Thêm tham số `amount` và mặc định bằng 1 nếu không truyền vào
   const addToCart = (product, amount = 1) => {
@@ -146,10 +151,34 @@ export const CartProvider = ({ children }) => {
     return cart.length;
   }, [cart]);
 
+  const addOrderFromCart = (cartItems, totalPrice) => {
+    if (!cartItems || cartItems.length === 0) return;
+
+    const newOrder = {
+      id: Math.floor(Math.random() * 900) + 103,
+      totalAmount: totalPrice,
+      orderDate: new Date().toLocaleDateString('vi-VN'),
+
+      status: 1,
+
+      items: cartItems.map(item => ({
+        id: item.id,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price
+      }))
+    };
+
+    setOrders(prevOrders => [newOrder, ...prevOrders]);
+  };
+
   const value = useMemo(
     () => ({
       cart,
       loading,
+      orders,
+      setOrders,
+      addOrderFromCart,
 
       addToCart,
       removeFromCart,
@@ -163,7 +192,7 @@ export const CartProvider = ({ children }) => {
       cartTotal,
       cartCount,
     }),
-    [cart, loading, cartTotal, cartCount]
+    [cart, loading, orders, cartTotal, cartCount]
   );
 
   return (
@@ -173,7 +202,6 @@ export const CartProvider = ({ children }) => {
   );
 };
 
-// CUSTOM HOOK
 export const useCart = () => {
   const context = useContext(CartContext);
 
