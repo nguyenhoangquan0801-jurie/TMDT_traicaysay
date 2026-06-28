@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Plus,
     Search,
@@ -15,16 +15,27 @@ import {
 } from 'lucide-react';
 
 const SellerProducts = () => {
-    // 1. Initial Mock Product Data
-    const [products, setProducts] = useState([
-        { id: 'PROD-001', name: 'Mít sấy dẻo thượng hạng 250g', sku: 'MSD250', category: 'Trái cây sấy dẻo', price: 90000, stock: 15, sales: 120, status: 'active', imageColor: 'bg-amber-100 text-amber-700' },
-        { id: 'PROD-002', name: 'Xoài sấy dẻo đặc sản 500g', sku: 'XSD500', category: 'Trái cây sấy dẻo', price: 140000, stock: 0, sales: 80, status: 'active', imageColor: 'bg-yellow-100 text-yellow-700' },
-        { id: 'PROD-003', name: 'Hạt Macca nứt vỏ Đắk Lắk 500g', sku: 'MCDL500', category: 'Hạt dinh dưỡng', price: 175000, stock: 40, sales: 45, status: 'active', imageColor: 'bg-stone-100 text-stone-700' },
-        { id: 'PROD-004', name: 'Vỏ bưởi sấy vị chanh dây 150g', sku: 'VBSCD150', category: 'Trái cây sấy dẻo', price: 55000, stock: 2, sales: 310, status: 'active', imageColor: 'bg-emerald-100 text-emerald-700' },
-        { id: 'PROD-005', name: 'Hạt điều rang muối vỏ lụa Bình Phước', sku: 'HDRM500', category: 'Hạt dinh dưỡng', price: 120000, stock: 18, sales: 90, status: 'unlisted', imageColor: 'bg-orange-100 text-orange-700' },
-        { id: 'PROD-006', name: 'Trà hoa cúc mật ong hảo hạng', sku: 'THCMO', category: 'Trà & Thảo mộc', price: 85000, stock: 35, sales: 65, status: 'active', imageColor: 'bg-yellow-50 text-yellow-600' },
-        { id: 'PROD-007', name: 'Khoai lang sấy giòn đà lạt 200g', sku: 'KLSG200', category: 'Trái cây sấy giòn', price: 65000, stock: 10, sales: 150, status: 'unlisted', imageColor: 'bg-purple-100 text-purple-700' }
-    ]);
+    // 1. Fetch states
+    const [products, setProducts] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [isError, setIsError] = useState(false);
+
+    useEffect(() => {
+        fetch('http://localhost:8080/api/seller/products')
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                setProducts(data);
+                setIsLoading(false);
+            })
+            .catch(err => {
+                console.error('Error fetching products:', err);
+                setIsError(true);
+                setIsLoading(false);
+            });
+    }, []);
 
     // 2. Interactive States
     const [searchQuery, setSearchQuery] = useState('');
@@ -116,6 +127,19 @@ const SellerProducts = () => {
                     Thêm sản phẩm mới
                 </button>
             </div>
+
+            {/* Error Banner */}
+            {isError && (
+                <div className="flex items-center gap-3 bg-rose-50 border border-rose-200 text-rose-700 px-5 py-4 rounded-2xl shadow-sm">
+                    <AlertTriangle className="w-5 h-5 flex-shrink-0" />
+                    <div>
+                        <p className="text-sm font-bold">Không thể kết nối đến máy chủ</p>
+                        <p className="text-xs font-medium mt-0.5 text-rose-500">
+                            Vui lòng kiểm tra backend đang chạy tại <code className="font-mono bg-rose-100 px-1 rounded">http://localhost:8080</code> rồi tải lại trang.
+                        </p>
+                    </div>
+                </div>
+            )}
 
             <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
 
@@ -229,7 +253,16 @@ const SellerProducts = () => {
                         </thead>
 
                         <tbody className="divide-y divide-slate-100">
-                            {filteredProducts.length === 0 ? (
+                            {isLoading ? (
+                                <tr>
+                                    <td colSpan="8" className="py-12 text-center text-slate-400 font-medium">
+                                        <div className="flex flex-col items-center gap-2">
+                                            <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                                            <span>Đang tải danh sách sản phẩm...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : filteredProducts.length === 0 ? (
                                 <tr>
                                     <td colSpan="8" className="py-12 text-center text-slate-400 font-medium">
                                         <div className="flex flex-col items-center gap-2">

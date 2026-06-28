@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, Link, NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
@@ -11,6 +11,31 @@ import {
 } from 'lucide-react';
 
 const SellerLayout = () => {
+  const [shopInfo, setShopInfo] = useState({
+    shopName: 'Đang tải...',
+    username: 'Loading...',
+    role: 'Kênh Người Bán',
+    notifications: 0
+  });
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/seller/info')
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to fetch seller info');
+        return res.json();
+      })
+      .then(data => setShopInfo(data))
+      .catch(err => {
+        console.error('Error fetching seller info, using mock values:', err);
+        setShopInfo({
+          shopName: 'NongLam Food (Mock)',
+          username: 'nonglam_seller',
+          role: 'Shop Đối Tác',
+          notifications: 3
+        });
+      });
+  }, []);
+
   return (
     <div className="flex flex-col h-screen bg-slate-50 font-sans text-slate-800">
 
@@ -35,7 +60,9 @@ const SellerLayout = () => {
         <div className="flex items-center gap-4">
           <button className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors relative">
             <Bell className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full"></span>
+            {shopInfo.notifications > 0 && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full"></span>
+            )}
           </button>
 
           <div className="flex items-center gap-3 pl-3 border-l border-slate-200">
@@ -43,8 +70,8 @@ const SellerLayout = () => {
               <User className="w-4 h-4" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-semibold text-slate-800">Username</span>
-              <span className="text-[11px] font-medium text-slate-500">Shop Đối Tác</span>
+              <span className="text-sm font-semibold text-slate-800">{shopInfo.shopName}</span>
+              <span className="text-[11px] font-medium text-slate-500">{shopInfo.role}</span>
             </div>
           </div>
         </div>
