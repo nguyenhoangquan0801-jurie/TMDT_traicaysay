@@ -103,11 +103,16 @@ const Navbar = () => {
           {/* Right Side Actions */}
           <div className="flex items-center gap-4">
             <Link
-              to="/admin/login"
+              to="/login"
               className="flex items-center gap-2 hover:text-emerald-600 transition-colors p-2"
               aria-label="Tài khoản"
             >
-              <User size={24} strokeWidth={2} />
+              <div className="flex items-center gap-2">
+                  <User size={22} />
+                  <span className="hidden lg:block text-sm">
+                    Đăng nhập
+                  </span>
+          </div>
             </Link>
 
             <button

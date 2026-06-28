@@ -12,12 +12,23 @@ import CheckoutPage from './pages/CheckoutPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import OrderHistory from './components/OrderHistory';
+import Auth from "./pages/Auth/Auth";
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import SellerLayout from './sellerPage/layouts/seller';
 import SellerDashboard from './sellerPage/pages/sellerDash';
 import SellerProducts from './sellerPage/pages/sellerProducts';
 import PrivateRoute from './routes/PrivateRoute';
+
+const ClientLayout = ({ children }) => {
+  return (
+    <div className="min-h-screen bg-gray-50 text-gray-800">
+      <Navbar />
+      <Cart />
+      <main>{children}</main>
+    </div>
+  );
+};
 
 const NotFoundPage = () => {
   return (
@@ -111,37 +122,125 @@ function App() {
 
           <Routes>
 
-            <Route path="/seller" element={<SellerLayout />}>
-              <Route index element={<SellerDashboard />} />
-              <Route path="dashboard" element={<SellerDashboard />} />
-              <Route path="products" element={<SellerProducts />} />
+            {/* ================= CLIENT ================= */}
+
+            <Route
+              path="/"
+              element={
+                <ClientLayout>
+                  <Home />
+                </ClientLayout>
+              }
+            />
+
+            <Route
+              path="/products"
+              element={
+                <ClientLayout>
+                  <ProductsPage />
+                </ClientLayout>
+              }
+            />
+
+            <Route
+              path="/product/:id"
+              element={
+                <ClientLayout>
+                  <ProductDetail />
+                </ClientLayout>
+              }
+            />
+
+            <Route
+              path="/checkout"
+              element={
+                <ClientLayout>
+                  <CheckoutPage />
+                </ClientLayout>
+              }
+            />
+
+            <Route
+              path="/history"
+              element={
+                <ClientLayout>
+                  <OrderHistory />
+                </ClientLayout>
+              }
+            />
+
+            <Route
+              path="/about"
+              element={
+                <ClientLayout>
+                  <AboutPage />
+                </ClientLayout>
+              }
+            />
+
+            <Route
+              path="/contact"
+              element={
+                <ClientLayout>
+                  <ContactPage />
+                </ClientLayout>
+              }
+            />
+
+            {/* ================= AUTH ================= */}
+
+            <Route
+              path="/login"
+              element={<Auth />}
+            />
+
+            {/* ================= ADMIN ================= */}
+
+            <Route
+              path="/admin/login"
+              element={<AdminLogin />}
+            />
+
+            <Route
+              path="/admin"
+              element={
+                <PrivateRoute>
+                  <AdminDashboard />
+                </PrivateRoute>
+              }
+            />
+
+            {/* ================= SELLER ================= */}
+
+            <Route
+              path="/seller"
+              element={<SellerLayout />}
+            >
+              <Route
+                index
+                element={<SellerDashboard />}
+              />
+
+              <Route
+                path="dashboard"
+                element={<SellerDashboard />}
+              />
+
+              <Route
+                path="products"
+                element={<SellerProducts />}
+              />
             </Route>
+
+            {/* ================= 404 ================= */}
 
             <Route
               path="*"
-              element={
-                <div className="min-h-screen bg-gray-50 text-gray-800">
-                  <Navbar />
-                  <Cart />
-                  <main>
-                    <Routes>
-
-                      <Route path="/" element={<Home />} />
-                      <Route path="/products" element={<ProductsPage />} />
-                      <Route path="/product/:id" element={<ProductDetail />} />
-                      <Route path="/checkout" element={<CheckoutPage />} />
-                      <Route path="/history" element={<OrderHistory />} />
-                      <Route path="/about" element={<AboutPage />} />
-                      <Route path="/contact" element={<ContactPage />} />
-                      <Route path="/admin/login" element={<AdminLogin />} />
-                      <Route path="/admin" element={<PrivateRoute> <AdminDashboard /> </PrivateRoute>} />
-                      <Route path="*" element={<NotFoundPage />} />
-                    </Routes>
-                  </main>
-                </div>
-              }
+              element={<NotFoundPage />}
             />
+
           </Routes>
+
         </BrowserRouter>
       </CartProvider>
     </AuthProvider>
