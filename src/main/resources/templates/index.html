@@ -574,6 +574,67 @@ a { text-decoration: none; transition: 0.3s; }
         flex-direction: column;
     }
 }
+/* Container quản lý dropdown */
+.user-dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-toggle-btn {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Khối menu đổ xuống */
+.user-dropdown-menu {
+    display: none; /* Mặc định ẩn */
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.15);
+    border-radius: 6px;
+    padding: 8px 0;
+    z-index: 1000;
+    text-align: left;
+}
+
+/* Các item bên trong menu */
+.user-dropdown-menu li a {
+    color: #333 !important;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    text-transform: none !important;
+}
+
+.user-dropdown-menu li a i {
+    width: 16px;
+    color: #555;
+}
+
+/* Hiệu ứng di chuột vào item */
+.user-dropdown-menu li a:hover {
+    background-color: #f5f5f5;
+    color: var(--primary-green) !important;
+}
+
+/* Đường gạch ngang phân tách */
+.user-dropdown-menu .divider {
+    height: 1px;
+    background-color: #eee;
+    margin: 6px 0;
+}
+
+/* Class active dùng để JS kích hoạt hiển thị */
+.user-dropdown-menu.show {
+    display: block !important;
+}
     </style>
 </head>
 <body>
@@ -596,17 +657,52 @@ a { text-decoration: none; transition: 0.3s; }
         <div class="header-actions">
             <div class="action-item">
                 <i class="fa fa-file-text-o"></i>
-                <span>Don hàng</span>
+                <span>Đơn hàng</span>
             </div>
             <div class="action-item">
                 <i class="fa fa-map-marker"></i>
                 <span>Cửa hàng</span>
             </div>
             
-            <a th:href="@{/login}" class="action-item" style="text-decoration: none;">
+            <a th:if="${userEmail == null}" th:href="@{/login}" class="action-item" style="text-decoration: none;">
                 <i class="fa fa-user-o"></i>
-                <span th:text="${userEmail != null} ? ${userEmail} : 'Tài khoản'">Tài khoản</span>
+                <span>Tài khoản</span>
             </a>
+
+            <div th:if="${userEmail != null}" class="action-item user-dropdown-container">
+                <div class="dropdown-toggle-btn" onclick="toggleUserMenu(event)">
+                    <i class="fa fa-user-circle-o" style="color: var(--accent-yellow); font-size: 16px;"></i>
+                    <span th:text="${userEmail}" style="font-weight: bold; margin-left: 5px;">email@domain.com</span>
+                    <i class="fa fa-caret-down" style="margin-left: 5px; font-size: 12px;"></i>
+                </div>
+                
+                <ul class="user-dropdown-menu" id="userDropdownMenu">
+                    <li th:if="${userRole == 'ADMIN'}">
+                        <a th:href="@{/admin/qa}">
+                            <i class="fa fa-comments-o"></i> Quản lý Q&A
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a th:href="@{/profile}">
+                            <i class="fa fa-id-card-o"></i> Thông tin tài khoản
+                        </a>
+                    </li>
+                    <li>
+                        <a th:href="@{/orders/history}">
+                            <i class="fa fa-history"></i> Lịch sử mua hàng
+                        </a>
+                    </li>
+                    
+                    <li class="divider"></li>
+                    
+                    <li>
+                        <a th:href="@{/logout}" style="color: #d9534f;">
+                            <i class="fa fa-sign-out" style="color: #d9534f;"></i> Đăng xuất
+                        </a>
+                    </li>
+                </ul>
+            </div>
             
             <div class="action-item cart">
                 <i class="fa fa-shopping-cart"></i>
@@ -718,55 +814,53 @@ a { text-decoration: none; transition: 0.3s; }
         </div>
 
         <div class="section-container" style="margin-top: 40px;">
-            <div class="section-title">TRÁI CÂY SẤY</div>
-            <div class="product-section-wrapper">
-                <div class="big-banner-left">
-                    <img src="https://via.placeholder.com/300x500?text=Promotion+Banner" style="width:100%; height:100%; object-fit: cover;" alt="KM">
-                </div>
-                <div class="product-grid-right">
-                    <div class="product-card">
-                        <span class="sold-out-badge">Hết hàng</span>
-                        <img th:src="@{/assets/thomsaydeo.png}" alt="SP">
-                        <h5 style="font-size: 0.85em;">Thơm sấy dẻo</h5>
-                        <p style="color: #008a45; font-weight: bold;">Liên hệ</p>
-                    </div>
-                    <div class="product-card">
-                        <img th:src="@{/assets/chanhdaysaydeo.png}" alt="SP">
-                        <h5 style="font-size: 0.85em;">Chanh dây sấy dẻo</h5>
-                        <p style="color: red; font-weight: bold;">50.000đ</p>
-                    </div>
-                    <div class="product-card">
-                        <img th:src="@{/assets/dudusaydeo.png}" alt="SP">
-                        <h5 style="font-size: 0.85em;">Đu đủ sấy dẻo</h5>
-                        <p style="color: red; font-weight: bold;">42.000đ</p>
-                    </div>
-                </div>
+    <div class="section-title">TRÁI CÂY SẤY</div>
+    <div class="product-section-wrapper">
+        <div class="big-banner-left">
+            <img src="https://via.placeholder.com/300x500?text=Promotion+Banner" style="width:100%; height:100%; object-fit: cover;" alt="KM">
+        </div>
+        <div class="product-grid-right">
+            <div class="product-card">
+                <span class="sold-out-badge">Hết hàng</span>
+                <img th:src="@{/assets/thomsaydeo.png}" alt="SP">
+                <h5 style="font-size: 0.85em;">Thơm sấy dẻo</h5>
+                <p style="color: #008a45; font-weight: bold;">Liên hệ</p>
+            </div>
+            <div class="product-card">
+                <img th:src="@{/assets/chanhdaysaydeo.png}" alt="SP">
+                <h5 style="font-size: 0.85em;">Chanh dây sấy dẻo</h5>
+                <p style="color: red; font-weight: bold;">50.000đ</p>
+            </div>
+            <div class="product-card">
+                <img th:src="@{/assets/dudusaydeo.png}" alt="SP">
+                <h5 style="font-size: 0.85em;">Đu đủ sấy dẻo</h5>
+                <p style="color: red; font-weight: bold;">42.000đ</p>
             </div>
         </div>
-    </section>
+    </div>
 
-    <section class="services-wrapper-bottom">
-        <div class="container">
-            <div class="view-all-center">
-                <a href="#" class="btn-view-all">Xem tất cả</a>
-            </div>
-            <hr class="light-divider">
-            <div class="services-horizontal">
-                <div class="service-item-box">
-                    <img th:src="@{/assets/delivery.png}" alt="Giao hàng" class="icon-img">
-                    <span class="service-text">Giao hàng đúng giờ</span>
-                </div>
-                <div class="service-item-box">
-                    <img th:src="@{/assets/promotion.png}" alt="Ưu đãi" class="icon-img">
-                    <span class="service-text">Ưu đãi mỗi ngày</span>
-                </div>
-                <div class="service-item-box">
-                    <img th:src="@{/assets/exchange.png}" alt="Đổi trả" class="icon-img">
-                    <span class="service-text">Đổi trả trong vòng 7 ngày</span>
-                </div>
-            </div>
+    <!-- HỢP NHẤT: Thêm nút Xem tất cả và Dịch vụ vào ngay bên dưới lưới sản phẩm -->
+    <div class="view-all-center" style="margin-top: 20px; text-align: center;">
+        <a href="#" class="btn-outline-green">Xem tất cả</a>
+    </div>
+    
+    <hr class="light-divider" style="border: 0; border-top: 1px solid #f0f0f0; margin: 20px 0;">
+    
+    <div class="services-horizontal" style="display: flex; justify-content: space-around; align-items: center; gap: 15px; flex-wrap: wrap;">
+        <div class="service-item-box" style="display: flex; align-items: center; gap: 10px;">
+            <img th:src="@{/assets/delivery.png}" alt="Giao hàng" class="icon-img" style="width: 30px; height: 30px; object-fit: contain;">
+            <span class="service-text" style="font-size: 14px; font-weight: 500;">Giao hàng đúng giờ</span>
         </div>
-    </section>
+        <div class="service-item-box" style="display: flex; align-items: center; gap: 10px;">
+            <img th:src="@{/assets/promotion.png}" alt="Ưu đãi" class="icon-img" style="width: 30px; height: 30px; object-fit: contain;">
+            <span class="service-text" style="font-size: 14px; font-weight: 500;">Ưu đãi mỗi ngày</span>
+        </div>
+        <div class="service-item-box" style="display: flex; align-items: center; gap: 10px;">
+            <img th:src="@{/assets/exchange.png}" alt="Đổi trả" class="icon-img" style="width: 30px; height: 30px; object-fit: contain;">
+            <span class="service-text" style="font-size: 14px; font-weight: 500;">Đổi trả trong vòng 7 ngày</span>
+        </div>
+    </div>
+</div>
 </main>
 
 <section class="news-section">
@@ -887,6 +981,22 @@ a { text-decoration: none; transition: 0.3s; }
         <p>&copy; 2026 Nonglamfood - Lưu giữ hương vị thiên nhiên.</p>
     </div>
 </footer>
+<script>
+function toggleUserMenu(event) {
+    event.stopPropagation(); // Ngăn sự kiện lan ra ngoài
+    const menu = document.getElementById("userDropdownMenu");
+    menu.classList.toggle("show");
+}
 
+// Tự động đóng menu nếu click bất kỳ đâu ngoài menu
+window.onclick = function(event) {
+    const menu = document.getElementById("userDropdownMenu");
+    if (menu && menu.classList.contains('show')) {
+        if (!event.target.closest('.user-dropdown-container')) {
+            menu.classList.remove('show');
+        }
+    }
+}
+</script>
 </body>
 </html>

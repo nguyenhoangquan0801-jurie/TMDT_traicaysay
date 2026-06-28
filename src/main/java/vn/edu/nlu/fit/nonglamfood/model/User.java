@@ -15,7 +15,6 @@ public class User {
 
     @Id 
     // Ý NGHĨA: Đánh dấu thuộc tính ngay phía dưới (id) chính là Khóa Chính (Primary Key) của bảng này.
-
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
     // Ý NGHĨA: Cấu hình cho Khóa Chính tự động tăng (Auto-increment) do Database quản lý (Cực kỳ phù hợp với MySQL, H2, PostgreSQL).
     private Long id;
@@ -23,6 +22,11 @@ public class User {
     @Column(nullable = false, unique = true, length = 50) 
     // Ý NGHĨA: Định nghĩa thuộc tính dưới DB: Không được để trống (NOT NULL), giá trị không được trùng lặp (UNIQUE) và độ dài tối đa là 50 ký tự.
     private String email; 
+
+    // 💡 CẬP NHẬT MỚI: Thuộc tính Tên đăng nhập (Username) giúp hỗ trợ đăng nhập song song với Email.
+    @Column(nullable = false, unique = true, length = 50)
+    // Ý NGHĨA: Bắt buộc NOT NULL để tài khoản LOCAL luôn có định danh ngắn gọn, UNIQUE để không bị trùng tên đăng nhập giữa các thành viên.
+    private String username;
 
     @Column(nullable = true) 
     // Ý NGHĨA: Cho phép cột này được phép trống (NULL). Bạn giải thích rất đúng: User đăng nhập bằng Google thì không cần lưu mật khẩu cục bộ.

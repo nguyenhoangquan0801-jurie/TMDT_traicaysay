@@ -7,6 +7,8 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    // Hàm tìm kiếm người dùng bằng Email, trả về Optional để tránh lỗi NullPointerException
+    // Tìm kiếm bằng Email HOẶC Username
+    Optional<User> findByEmailOrUsername(String email, String username);
+    Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email);
 }

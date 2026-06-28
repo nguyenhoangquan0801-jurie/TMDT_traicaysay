@@ -15,15 +15,16 @@ public class CustomUserDetailsService implements UserDetailsService {
     private UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        // Tìm user theo email dưới DB
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy email: " + email));
+    public UserDetails loadUserByUsername(String loginInput) throws UsernameNotFoundException {
+        // Tìm trong DB xem 'loginInput' trùng với email hay username của ai không
+        User user = userRepository.findByEmailOrUsername(loginInput, loginInput)
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy tài khoản với: " + loginInput));
 
-        // Cập nhật chuẩn Spring Boot 4+: Sử dụng hệ thống Builder để đóng gói thông tin tài khoản
-        return org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
-                .password(user.getPassword()) // Lấy mật khẩu đã Bcrypt từ DB
-                .roles(user.getRole().replace("ROLE_", "")) // Spring Security 6+ tự thêm tiền tố ROLE_, nên ta cắt chữ cũ đi nếu có để tránh trùng lặp thành ROLE_ROLE_USER
+        // Trả về đối tượng UserDetails hợp lệ cho Spring Security
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getEmail()) 
+                .password(user.getPassword())
+                .roles(user.getRole()) // 👈 Đã tinh gọn: Nhận trực tiếp "USER" / "ADMIN" từ DB sạch
                 .build();
     }
 }

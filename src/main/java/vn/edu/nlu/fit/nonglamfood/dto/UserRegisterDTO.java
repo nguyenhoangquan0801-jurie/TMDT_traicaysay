@@ -6,6 +6,7 @@ import lombok.Data;
 // Ý NGHĨA: Annotation của Lombok tự động sinh ngầm các hàm Getter, Setter, toString() 
 // giúp code ngắn gọn và tránh lỗi vỡ cấu hình khi Thymeleaf map dữ liệu.
 public class UserRegisterDTO {
+    private String username;
     
     private String fullName;
     

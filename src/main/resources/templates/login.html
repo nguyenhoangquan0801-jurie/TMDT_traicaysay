@@ -19,7 +19,6 @@
         .divider span { position: absolute; top: -10px; background: white; padding: 0 10px; left: 50%; transform: translateX(-50%); color: #999; font-size: 13px; }
         .btn-google { display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px solid #008a45; color: #008a45; background: white; padding: 10px; border-radius: 4px; text-decoration: none; font-weight: bold; transition: all 0.3s; margin-bottom: 15px; }
         .btn-google:hover { background-color: #008a45; color: white; }
-        /* Style mới cho link chuyển hướng sang trang đăng ký */
         .link-register { display: block; margin-top: 20px; color: #008a45; text-decoration: none; font-size: 14px; }
         .link-register:hover { text-decoration: underline; color: #006b35; }
     </style>
@@ -44,8 +43,8 @@
 
     <form th:action="@{/login}" method="POST">
         <div class="form-group">
-            <label>Email của bạn</label>
-            <input type="email" name="email" placeholder="user@nonglamfood.com" required>
+            <label>Email hoặc Tên đăng nhập</label>
+            <input type="text" name="username" placeholder="admin@nonglamfood.com hoặc admin_nonglam" required>
         </div>
         <div class="form-group">
             <label>Mật khẩu</label>

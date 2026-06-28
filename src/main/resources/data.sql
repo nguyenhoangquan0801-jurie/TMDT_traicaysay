@@ -1,8 +1,46 @@
+-- =========================================================================
+-- 1. KHỞI TẠO LẠI DỮ LIỆU BẢNG USERS (Đã đồng bộ sạch chữ ROLE_)
+-- =========================================================================
 DELETE FROM users;
 
--- Chú ý chữ 'LOCAL' đã được viết hoa toàn bộ để khớp với ENUM trong code Java
-INSERT INTO users (email, password, full_name, provider, role) 
-VALUES ('user@nonglamfood.com', '$2a$10$R77pOnp9b5GZ6H4W8EunOunvLdf7EVE0U6gA8W2TfOqQ3uD.hH91a', 'Nguyen Van User', 'LOCAL', 'ROLE_USER');
+-- Tài khoản User mẫu (Mật khẩu đăng nhập: 123456)
+INSERT INTO users (email, username, password, full_name, provider, role) 
+VALUES ('user@nonglamfood.com', 'user_nonglam', '$2a$10$X50vU9AebpG6qN.lqdfaUeyCIEW.EFOeOQ82tHCSq04P4vjP1D8mO', 'Nguyen Van User', 'LOCAL', 'USER'); -- 👈 Chỉ để USER
 
-INSERT INTO users (email, password, full_name, provider, role) 
-VALUES ('admin@nonglamfood.com', '$2a$10$R77pOnp9b5GZ6H4W8EunOunvLdf7EVE0U6gA8W2TfOqQ3uD.hH91a', 'Tran Thi Admin', 'LOCAL', 'ROLE_ADMIN');
+-- Tài khoản Admin mẫu (Mật khẩu đăng nhập: 123456)
+INSERT INTO users (email, username, password, full_name, provider, role) 
+VALUES ('admin@nonglamfood.com', 'admin_nonglam', '$2a$10$X50vU9AebpG6qN.lqdfaUeyCIEW.EFOeOQ82tHCSq04P4vjP1D8mO', 'Tran Thi Admin', 'LOCAL', 'ADMIN'); -- 👈 Chỉ để ADMIN
+
+
+-- =========================================================================
+-- 2. KHỞI TẠO DỮ LIỆU BẢNG REVIEWS & PRODUCT QUESTIONS (Giữ nguyên bên dưới)
+-- =========================================================================
+DELETE FROM product_questions;
+DELETE FROM reviews;
+
+INSERT INTO reviews (product_id, user_name, rating_stars, content, created_at) VALUES
+(1, 'Trần Minh Tâm', 5, 'Vỏ bưởi sấy dẻo rất thơm, vị ngọt thanh không gắt, hơi nhặng đắng nhẹ đặc trưng rất cuốn. Sẽ ủng hộ tiếp.', '2026-06-25 09:15:00'),
+(1, 'Lê Thị Hồng', 4, 'Sản phẩm đóng gói đẹp, giao hàng nhanh. Trái cây sấy dẻo của Nonglamfood thì chất lượng khỏi bàn rồi.', '2026-06-26 14:30:00'),
+(2, 'Nguyễn Hoàng Long', 5, 'Xoài sấy dẻo miếng dày, dẻo quánh, thơm phức mùi xoài chín tự nhiên. Trái cây sấy dẻo nhà mình thích mê!', '2026-06-27 10:20:00');
+
+INSERT INTO product_questions (product_id, user_name, content, parent_id, status, is_admin_reply, created_at) VALUES
+(1, 'Hệ thống', 'Sản phẩm này có sử dụng chất bảo quản không?', NULL, 'POPULAR', FALSE, '2026-06-20 08:00:00'),
+(1, 'Hệ thống', 'Hạn sử dụng của vỏ bưởi sấy dẻo là bao lâu?', NULL, 'POPULAR', FALSE, '2026-06-20 08:05:00'),
+(2, 'Hệ thống', 'Người tiểu đường có ăn được xoài sấy dẻo không?', NULL, 'POPULAR', FALSE, '2026-06-20 08:10:00');
+
+INSERT INTO product_questions (product_id, user_name, content, parent_id, status, is_admin_reply, created_at) VALUES
+(1, 'Vũ Hoàng Yến', 'Sản phẩm này đạt tiêu chuẩn xuất khẩu sang châu Âu chưa shop?', NULL, 'ANSWERED', FALSE, '2026-06-24 15:00:00');
+
+INSERT INTO product_questions (product_id, user_name, content, parent_id, status, is_admin_reply, created_at) VALUES
+(1, 'Nonglamfood - Quản trị viên', 'Chào Hoàng Yến, tất cả sản phẩm sấy của Nonglamfood đều được sản xuất theo quy trình đạt chuẩn HACCP, ISO 22000 và đã xuất khẩu thành công sang các thị trường khó tính như Châu Âu, Úc, Singapore bạn nhé!', (SELECT MAX(id) FROM product_questions WHERE user_name = 'Vũ Hoàng Yến'), 'ANSWERED', TRUE, '2026-06-24 15:30:00');
+
+INSERT INTO product_questions (product_id, user_name, content, parent_id, status, is_admin_reply, created_at) VALUES
+(2, 'Nguyễn Đình Trọng', 'If mở túi ra ăn không hết thì bảo quản như thế nào để không bị cứng?', NULL, 'ANSWERED', FALSE, '2026-06-25 16:10:00');
+
+INSERT INTO product_questions (product_id, user_name, content, parent_id, status, is_admin_reply, created_at) VALUES
+(2, 'Nonglamfood - Quản trị viên', 'Chào bạn Trọng, sau khi mở bao bì, nếu dùng không hết bạn nên vuốt kín miệng túi zip và bảo quản trong ngăn mát tủ lạnh nhé!', (SELECT MAX(id) FROM product_questions WHERE user_name = 'Nguyễn Đình Trọng'), 'ANSWERED', TRUE, '2026-06-25 16:45:00');
+
+INSERT INTO product_questions (product_id, user_name, content, parent_id, status, is_admin_reply, created_at) VALUES
+(1, 'Lê Hoài Nam', 'Shop ơiii, vỏ bưởi này bị sai lỗi chính tả trên bao bì à? Mình mún mua sll làm quà tặng có triết khấu ko?', NULL, 'PENDING', FALSE, '2026-06-28 14:00:00'),
+(2, 'Hoàng Thùy Linh', 'Xoài này có bị sượng hay nhìu sơ dừa không shop, răng yếu có nhai đc hk?', NULL, 'PENDING', FALSE, '2026-06-28 15:20:00'),
+(3, 'Nguyễn Thị Thảo', 'Mún mua chanh dây sấy dẻo ship ra Hà Nội thì mất bủi ngày vậy shop?', NULL, 'PENDING', FALSE, '2026-06-28 16:15:00');

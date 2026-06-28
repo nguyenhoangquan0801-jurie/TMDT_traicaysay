@@ -41,6 +41,15 @@ public class AuthController {
 
             // Đưa dữ liệu email thực tế thu được (Của cả Google lẫn Thường) ra giao diện thông qua biến "userEmail"
             model.addAttribute("userEmail", email);
+
+            // ================== LỆNH BỔ SUNG ĐỂ SỬA LỖI MENU Q&A ==================
+            var user = userService.findByEmail(email); 
+            if (user != null) {
+                // Cắt bỏ chữ "ROLE_" để giao diện HTML dùng biến 'userRole' gọn gàng
+                String cleanRole = user.getRole().replace("ROLE_", ""); 
+                model.addAttribute("userRole", cleanRole); 
+            }   
+            // ======================================================================
         }
         
         // Trả về giao diện có tên là "index" (Spring Boot tự tìm file src/main/resources/templates/index.html)

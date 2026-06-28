@@ -9,20 +9,35 @@ import vn.edu.nlu.fit.nonglamfood.model.Provider;
 import vn.edu.nlu.fit.nonglamfood.repository.UserRepository;
 
 @Service
-// Ý NGHĨA: Đăng ký lớp này thành một Spring Bean thuộc tầng Service. 
-// Nơi đây tập trung toàn bộ "logic đầu não" của dự án trước khi đổ xuống DB.
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder; // Tiêm bộ mã hóa PasswordEncoder đã cấu hình ở SecurityConfig
+    private PasswordEncoder passwordEncoder;
+
+    // ================== HÀM BỔ SUNG MỚI ĐỂ PHỤC VỤ AUTHCONTROLLER ==================
+    /**
+     * Tìm kiếm thông tin người dùng bằng email
+     * @param email tài khoản cần tìm
+     * @return Thực thể User nếu có, ngược lại trả về null
+     */
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+    // ==============================================================================
 
     public void registerNewUser(UserRegisterDTO registerDTO) throws Exception {
+        
         // 1. NGHIỆP VỤ: Kiểm tra Email xem đã có ai đăng ký trước đó trong hệ thống chưa
         if (userRepository.findByEmail(registerDTO.getEmail()).isPresent()) {
             throw new Exception("Email này đã được sử dụng trong hệ thống!");
+        }
+
+        // 💡 CẬP NHẬT MỚI: Kiểm tra Username xem đã có ai đăng ký trước đó chưa
+        if (userRepository.findByUsername(registerDTO.getUsername()).isPresent()) {
+            throw new Exception("Tên đăng nhập này đã tồn tại! Vui lòng chọn tên khác.");
         }
 
         // 2. NGHIỆP VỤ: Kiểm tra xem 2 ô mật khẩu người dùng gõ có trùng khớp không
@@ -34,6 +49,9 @@ public class UserService {
         User newUser = new User();
         newUser.setEmail(registerDTO.getEmail());
         newUser.setFullName(registerDTO.getFullName());
+        
+        // 💡 CẬP NHẬT MỚI: Lưu Username vào thực thể Entity
+        newUser.setUsername(registerDTO.getUsername().trim());
         
         // MÃ HÓA: Ép mật khẩu thường qua lõi băm BCrypt mã hóa một chiều bảo mật
         newUser.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
