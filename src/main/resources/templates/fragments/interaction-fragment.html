@@ -1,0 +1,165 @@
+<!--Cop paste ở product_detail để có mục đánh giá và thắc mắc-->
+<!--<div th:replace="~{fragments/interaction-fragment :: productInteraction}"></div>-->>
+
+<div th:fragment="productInteraction" class="interaction-container" style="margin-top: 50px; font-family: Arial, sans-serif; max-width: 1200px; margin-left: auto; margin-right: auto; padding: 0 15px;">
+    
+    <div class="tab-navigation" style="display: flex; gap: 10px; border-bottom: 2px solid #008a45; padding-bottom: 0;">
+        <button class="tab-btn active" onclick="switchTab('review-tab')" id="btn-review-tab"
+                style="background: #008a45; color: white; border: none; padding: 10px 20px; border-radius: 4px 4px 0 0; cursor: pointer; font-weight: bold; font-size: 16px;">
+            Đánh giá từ khách hàng
+        </button>
+        <button class="tab-btn" onclick="switchTab('qa-tab')" id="btn-qa-tab"
+                style="background: #e0e0e0; color: #333; border: none; padding: 10px 20px; border-radius: 4px 4px 0 0; cursor: pointer; font-weight: bold; font-size: 16px;">
+            Hỏi đáp & Thắc mắc
+        </button>
+    </div>
+
+    <div id="review-tab" class="tab-content" style="display: block; padding-top: 20px;">
+        <div id="review-toast" style="display: none; background: #d4edda; color: #155724; padding: 15px; border-radius: 4px; margin-bottom: 20px; font-weight: bold; border-left: 5px solid #28a745;">
+            🎉 Cảm ơn bạn đã đánh giá sản phẩm! Ý kiến của bạn giúp Nonglamfood hoàn thiện hơn.
+        </div>
+
+        <div class="review-form" style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #eee;">
+            <h4 style="margin-top:0; color: #008a45;">Viết nhận xét của bạn</h4>
+            <form id="ajax-review-form">
+                <input type="hidden" name="productId" th:value="${product.id}" id="review-product-id">
+                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    <input type="text" id="review-user" placeholder="Họ và tên của bạn" required style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    <select id="review-stars" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px; background: white;">
+                        <option value="5">⭐⭐⭐⭐⭐ 5 Sao (Rất tốt)</option>
+                        <option value="4">⭐⭐⭐⭐ 4 Sao (Tốt)</option>
+                        <option value="3">⭐⭐⭐ 3 Sao (Bình thường)</option>
+                        <option value="2">⭐⭐ 2 Sao (Tạm được)</option>
+                        <option value="1">⭐ 1 Sao (Kém)</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <textarea id="review-content" rows="3" placeholder="Chia sẻ trải nghiệm thực tế của bạn về hương vị, bao bì sản phẩm..." required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"></textarea>
+                </div>
+                <button type="submit" style="background: #008a45; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">Gửi đánh giá</button>
+            </form>
+        </div>
+
+        <div class="reviews-list">
+            <div th:each="rev : ${reviews}" style="border-bottom: 1px solid #eee; padding: 15px 0;">
+                <strong th:text="${rev.userName}">Nguyễn Văn A</strong> 
+                <span style="color: #ffb400; margin-left: 10px;" th:text="${'★'.repeat(rev.ratingStars)}">⭐⭐⭐⭐⭐</span>
+                <p style="margin: 8px 0 0 0; color: #555;" th:text="${rev.content}">Trái cây sấy dẻo ngon.</p>
+            </div>
+            <p th:if="${#lists.isEmpty(reviews)}" style="color: #888; font-style: italic;">Chưa có đánh giá nào cho sản phẩm này.</p>
+        </div>
+    </div>
+
+    <div id="qa-tab" class="tab-content" style="display: none; padding-top: 20px;">
+        <div class="popular-questions-wrapper" style="margin-bottom: 25px;" th:if="${not #lists.isEmpty(popularQuestions)}">
+            <h5 style="margin-top: 0; color: #555;">💡 Câu hỏi thường gặp:</h5>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button th:each="pq : ${popularQuestions}" th:onclick="fillQuestion([[${pq.content}]])"
+                        style="background: #eafaf1; color: #008a45; border: 1px solid #b3e6cc; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 13px;">
+                    ✨ <span th:text="${pq.content}">Sản phẩm có đường không?</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="qa-form-wrapper" style="background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; border: 1px solid #eee; position: relative;">
+            <h5 style="margin-top: 0; color: #008a45;">Đặt câu hỏi mới của bạn:</h5>
+            <form th:action="@{/api/product/question}" method="POST">
+                <input type="hidden" name="productId" th:value="${product.id}" id="qa-product-id" />
+                <div style="margin-bottom: 15px;">
+                    <input type="text" name="userName" placeholder="Họ và tên của bạn" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                </div>
+                <div style="margin-bottom: 15px; position: relative;">
+                    <textarea name="content" id="qa-textarea" rows="3" oninput="doAutocomplete()" placeholder="Nhập thắc mắc của bạn tại đây..." required autocomplete="off"
+                              style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; resize: vertical;"></textarea>
+                    <div id="autocomplete-results" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; background: white; border: 1px solid #ccc; border-top: none; border-radius: 0 0 4px 4px; z-index: 999; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-height: 200px; overflow-y: auto;"></div>
+                </div>
+                <button type="submit" style="background: #008a45; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">Gửi thắc mắc (Chờ duyệt)</button>
+            </form>
+        </div>
+
+        <div class="qa-list-answered">
+            <h4 style="color: #333; border-bottom: 1px solid #eee; padding-bottom: 10px;">Cộng đồng thảo luận</h4>
+            <div th:each="question : ${answeredQuestions}" style="margin-bottom: 25px; background: #fff; padding: 15px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                <div style="display: flex; gap: 10px;">
+                    <span style="background: #e2f0d9; color: #008a45; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 13px;">Q</span>
+                    <div>
+                        <strong th:text="${question.userName}">Khách hàng</strong>
+                        <p style="margin: 5px 0; color: #333;" th:text="${question.content}">Nội dung câu hỏi</p>
+                    </div>
+                </div>
+                <div th:each="reply : ${question.replies}" style="margin-left: 38px; margin-top: 10px; background: #f4fbf7; padding: 12px; border-left: 3px solid #008a45; border-radius: 0 4px 4px 0;">
+                    <strong style="color: #008a45;">🌱 Nonglamfood - Quản trị viên</strong>
+                    <p style="margin: 5px 0; color: #444;" th:text="${reply.content}">Nội dung câu trả lời của Admin</p>
+                </div>
+            </div>
+            <p th:if="${#lists.isEmpty(answeredQuestions)}" style="color: #888; font-style: italic;">Chưa có thảo luận công khai nào cho sản phẩm này.</p>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+            document.getElementById(tabId).style.display = 'block';
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.style.background = '#e0e0e0'; btn.style.color = '#333';
+            });
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.style.background = '#008a45'; activeBtn.style.color = 'white';
+        }
+
+        document.getElementById('ajax-review-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('productId', document.getElementById('review-product-id').value);
+            formData.append('userName', document.getElementById('review-user').value);
+            formData.append('ratingStars', document.getElementById('review-stars').value);
+            formData.append('content', document.getElementById('review-content').value);
+
+            fetch('/api/product/review', { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    const toast = document.getElementById('review-toast');
+                    toast.style.display = 'block';
+                    document.getElementById('review-user').value = '';
+                    document.getElementById('review-content').value = '';
+                    setTimeout(() => { toast.style.display = 'none'; window.location.reload(); }, 3000);
+                }
+            }).catch(error => console.error('Lỗi:', error));
+        });
+
+        function fillQuestion(text) {
+            document.getElementById('qa-textarea').value = text;
+            document.getElementById('autocomplete-results').style.display = 'none';
+        }
+
+        function doAutocomplete() {
+            const keyword = document.getElementById('qa-textarea').value;
+            const productId = document.getElementById('qa-product-id').value;
+            const resultsBox = document.getElementById('autocomplete-results');
+
+            if (keyword.trim().length < 2) { resultsBox.style.display = 'none'; return; }
+
+            fetch(`/api/product/question/autocomplete?productId=${productId}&keyword=${encodeURIComponent(keyword)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.length === 0) { resultsBox.style.display = 'none'; return; }
+                resultsBox.innerHTML = '';
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.style.padding = '10px'; div.style.cursor = 'pointer'; div.style.borderBottom = '1px solid #f0f0f0';
+                    div.innerHTML = `🔍 <span style="color:#555;">Có câu hỏi tương tự:</span> <strong>${item.content}</strong>`;
+                    div.onclick = function() { fillQuestion(item.content); };
+                    div.onmouseover = () => div.style.background = '#f5f5f5';
+                    div.onmouseout = () => div.style.background = 'white';
+                    resultsBox.appendChild(div);
+                });
+                resultsBox.style.display = 'block';
+            }).catch(err => console.error("Lỗi:", err));
+        }
+
+        document.addEventListener('click', function(e) {
+            if (e.target.id !== 'qa-textarea') { document.getElementById('autocomplete-results').style.display = 'none'; }
+        });
+    </script>
+</div>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Nonglamfood - Quản Lý Hỏi Đáp Sản Phẩm</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5; margin: 0; padding: 20px; }
+        .admin-container { max-width: 1000px; margin: 0 auto; }
+        .page-title { color: #333; border-left: 5px solid #008a45; padding-left: 15px; margin-bottom: 30px; }
+        
+        /* Phong cách Khối Card Shopee */
+        .admin-qa-card { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid #e0e0e0; overflow: hidden; }
+        
+        /* Header thông tin sản phẩm giống Shopee */
+        .product-info-header { display: flex; align-items: center; gap: 15px; padding: 15px; background: #fafafa; border-bottom: 1px solid #f0f0f0; }
+        .product-img { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #eee; }
+        .product-link { font-weight: bold; color: #008a45; text-decoration: none; font-size: 16px; }
+        .product-link:hover { text-decoration: underline; }
+        .tag-pending { margin-left: auto; background: #fff7ed; color: #ea580c; border: 1px solid #ffedd5; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
+        
+        /* Khu vực nhập liệu xử lý */
+        .qa-handling-body { padding: 20px; }
+        .customer-meta { font-size: 13px; color: #666; margin-bottom: 15px; background: #f8fafc; padding: 8px 12px; border-radius: 4px; display: inline-block; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 14px; font-weight: 600; color: #444; margin-bottom: 6px; }
+        .input-control { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 14px; transition: border 0.2s; }
+        .input-control:focus { border-color: #008a45; outline: none; box-shadow: 0 0 0 3px rgba(0,138,69,0.1); }
+        
+        /* Nút lưu hành động */
+        .btn-submit { background: #008a45; color: white; border: none; padding: 10px 24px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px; transition: background 0.2s; }
+        .btn-submit:hover { background: #006e36; }
+        .empty-state { text-align: center; padding: 50px; background: white; border-radius: 8px; color: #888; border: 1px dashed #ccc; }
+    </style>
+</head>
+<body>
+
+<div class="admin-container">
+    <h2 class="page-title">QUẢN LÝ THẮC MẮC CHỜ PHẢN HỒI</h2>
+
+    <div class="admin-qa-card" th:each="item : ${pendingQuestions}">
+        
+        <div class="product-info-header">
+            <img th:src="@{/assets/images/logo.png}" class="product-img" alt="Ảnh sản phẩm">
+            <div>
+                <a th:href="@{/product/{id}(id=${item.productId})}" target="_blank" class="product-link">
+                    Mã sản phẩm hoặc Tên sản phẩm liên kết (ID: <span th:text="${item.productId}">123</span>)
+                </a>
+                <div style="font-size: 12px; color: #94a3b8; margin-top: 3px;">Hệ thống: Nonglamfood E-Commerce</div>
+            </div>
+            <span class="tag-pending">⏳ Chờ Admin trả lời</span>
+        </div>
+
+        <div class="qa-handling-body">
+            <div class="customer-meta">
+                👤 Người hỏi: <strong th:text="${item.userName}">Nguyễn Văn A</strong> 
+                • 🕒 Gửi lúc: <span th:text="${#annotations != null ? item.createdAt : 'Vừa xong'}">28/06/2026</span>
+            </div>
+
+            <form th:action="@{/admin/questions/reply}" method="POST">
+                <input type="hidden" name="questionId" th:value="${item.id}" />
+                <input type="hidden" name="productId" th:value="${item.productId}" />
+
+                <div class="form-group">
+                    <label>Nội dung câu hỏi của khách (Chỉnh sửa chuẩn chính tả nếu cần):</label>
+                    <input type="text" name="editedContent" th:value="${item.content}" class="input-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Nội dung phản hồi từ ban quản trị Nonglamfood:</label>
+                    <textarea name="adminReply" rows="3" class="input-control" placeholder="Chào bạn, cảm ơn bạn đã quan tâm đến sản phẩm..." required style="resize: vertical;"></textarea>
+                </div>
+
+                <div style="text-align: right;">
+                    <button type="submit" class="btn-submit">
+                        💾 Phản hồi & Duyệt hiển thị
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="empty-state" th:if="${#lists.isEmpty(pendingQuestions)}">
+        🎉 Tuyệt vời! Hiện tại không có thắc mắc nào đang chờ xử lý. Bạn đã hoàn thành sạch sẽ danh sách công việc!
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,4 +1,65 @@
-# Getting Started with Create React App
+
+
+# Hướng dẫn tích hợp Đăng nhập bằng Google (OAuth2) cho Spring Boot
+
+Để ứng dụng của bạn có thể xác thực người dùng qua Google, bạn cần thực hiện cấu hình trên Google Cloud Console và kết nối vào dự án Spring Boot.
+
+## I. Yêu cầu tiên quyết (Điều kiện cần)
+
+Trước khi bắt đầu, hãy đảm bảo tài khoản Google bạn dùng để tạo dự án đáp ứng các điều kiện bảo mật sau:
+
+1. **Bảo mật 2 lớp (2FA):** Tài khoản Google của bạn **bắt buộc phải bật xác minh 2 bước** để đảm bảo an toàn cho các ứng dụng có truy cập vào thông tin nhạy cảm.
+2. **Số điện thoại xác thực:** Tài khoản phải được cập nhật số điện thoại chính chủ để nhận mã OTP trong quá trình xác thực.
+3. **Dự án Google Cloud:** Bạn cần tạo một dự án mới trên [Google Cloud Console](https://console.cloud.google.com/).
+
+---
+
+## II. Các bước lấy Client ID và Client Secret
+
+### 1. Cấu hình Màn hình đồng ý (OAuth Consent Screen)
+
+* Truy cập **APIs & Services** > **OAuth consent screen**.
+* Chọn **External** > **Create**.
+* Điền thông tin ứng dụng (Tên, Email hỗ trợ).
+* Ở phần **Scopes**, thêm các phạm vi: `email`, `profile`, `openid`.
+* Nhấn **Save and Continue**.
+
+### 2. Tạo Credentials
+
+* Vào mục **Credentials** > **Create Credentials** > **OAuth client ID**.
+* Chọn **Application type**: **Web application**.
+* Tại mục **Authorized redirect URIs**, thêm địa chỉ sau:
+`http://localhost:8080/login/oauth2/code/google`
+* Nhấn **Create**. Hệ thống sẽ cấp cho bạn **Client ID** và **Client Secret**.
+
+---
+
+## III. Cấu hình trong dự án Spring Boot
+
+Mở file `src/main/resources/application.properties` và thêm cấu hình sau:
+
+```properties
+# Thay thế bằng mã thật của bạn
+spring.security.oauth2.client.registration.google.client-id=YOUR_CLIENT_ID
+spring.security.oauth2.client.registration.google.client-secret=YOUR_CLIENT_SECRET
+spring.security.oauth2.client.registration.google.scope=email,profile
+
+```
+
+---
+
+## IV. Lưu ý bảo mật quan trọng
+
+> ⚠️ **CẢNH BÁO:**
+> * **Không bao giờ** chia sẻ hoặc đẩy file `application.properties` (có chứa `client-secret`) lên GitHub hoặc các nền tảng lưu trữ công khai.
+> * Hãy sử dụng các tệp tin cấu hình môi trường hoặc file `.gitignore` để loại bỏ file này khỏi Git.
+> * Nếu lỡ lộ mã, hãy truy cập ngay vào Google Cloud Console để nhấn **Reset Secret** để hủy mã cũ và cấp mã mới ngay lập tức.
+> 
+> 
+
+
+
+Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
