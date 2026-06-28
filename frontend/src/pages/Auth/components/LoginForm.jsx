@@ -90,7 +90,7 @@ const LoginForm = ({ goRegister, goForgot }) => {
       <div className="text-center mb-8">
 
         <img
-          src="/images/logo.png"
+          src="/images/logo.jpg"
           alt="logo"
           className="w-20 mx-auto mb-4"
         />
@@ -163,8 +163,8 @@ const LoginForm = ({ goRegister, goForgot }) => {
               <img
                 src={
                   showPassword
-                    ? "/images/auth/eye-off.png"
-                    : "/images/auth/eye.png"
+                    ? "/images/auth/eye-off.jpg"
+                    : "/images/auth/eye.jpg"
                 }
                 alt="eye"
                 className="w-6"

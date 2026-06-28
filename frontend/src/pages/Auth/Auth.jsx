@@ -25,7 +25,7 @@ return (
         <div className="hidden md:flex bg-green-700 text-white p-10 flex-col justify-center">
 
         <img
-            src="/images/auth/banner.png"
+            src="/images/auth/banner.jpg"
             alt="banner"
             className="w-full rounded-2xl mb-8"
         />

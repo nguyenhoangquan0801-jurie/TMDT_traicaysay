@@ -26,9 +26,11 @@ const SocialLogin = () => {
           onClick={handleFacebook}
           className="border rounded-xl py-3 hover:bg-blue-50 transition flex items-center justify-center gap-2"
         >
-          <span className="text-xl">
-            📘
-          </span>
+          <img
+          src="/images/auth/Facebook_Logo.png"
+          alt="logo"
+          className="w-10 mx-auto mb-4"
+        />
 
           Facebook
         </button>
@@ -37,9 +39,11 @@ const SocialLogin = () => {
           onClick={handleGoogle}
           className="border rounded-xl py-3 hover:bg-red-50 transition flex items-center justify-center gap-2"
         >
-          <span className="text-xl">
-            🌐
-          </span>
+          <img
+          src="/images/auth"
+          alt="logo"
+          className="w-10 mx-auto mb-4"
+        />
 
           Google
         </button>
