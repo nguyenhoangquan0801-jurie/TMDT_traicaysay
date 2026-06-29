@@ -10,6 +10,8 @@ import vn.edu.nlu.fit.nonglamfood.repository.RoleRepository;
 import vn.edu.nlu.fit.nonglamfood.repository.UserRepository;
 import vn.edu.nlu.fit.nonglamfood.security.JwtUtil;
 import vn.edu.nlu.fit.nonglamfood.service.AuthService;
+import vn.edu.nlu.fit.nonglamfood.service.EmailService;
+import vn.edu.nlu.fit.nonglamfood.service.OtpService;
 
 import java.time.LocalDateTime;
 
@@ -21,6 +23,8 @@ public class AuthServiceImpl implements AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final EmailService emailService;
+    private final OtpService otpService;
 
     @Override
     public UserResponse register(RegisterRequest request) {
@@ -77,5 +81,35 @@ public class AuthServiceImpl implements AuthService {
                 .fullName(user.getFullName())
                 .email(user.getEmail())
                 .build();
+    }
+    @Override
+    public void forgotPassword(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Email không tồn tại."));
+
+        String otp = otpService.generateOtp(email);
+
+        emailService.sendOtp(email, otp);
+
+    }
+    @Override
+    public boolean verifyOtp(String email, String otp) {
+
+        return otpService.verifyOtp(email, otp);
+
+    }
+    @Override
+    public void resetPassword(String email, String newPassword) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tài khoản."));
+
+        user.setPasswordHash(
+                passwordEncoder.encode(newPassword)
+        );
+
+        userRepository.save(user);
+
     }
 }
