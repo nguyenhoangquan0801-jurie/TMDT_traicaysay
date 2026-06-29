@@ -1,55 +1,54 @@
+import { useAuth } from "../../../context/AuthContext";
+
 const SocialLogin = () => {
-
-  const handleFacebook = () => {
-    console.log("Facebook Login");
-  };
-
-  const handleGoogle = () => {
-    console.log("Google Login");
-  };
+  const { loginGoogle, loginFacebook } = useAuth();
 
   return (
-    <>
-      <div className="flex items-center my-8">
-        <div className="flex-1 border-t"></div>
+    <div className="mt-8">
 
-        <span className="px-4 text-gray-500 text-sm">
+      <div className="flex items-center gap-4 mb-5">
+
+        <div className="flex-1 h-px bg-gray-200"></div>
+
+        <span className="text-sm text-gray-500">
           Hoặc tiếp tục với
         </span>
 
-        <div className="flex-1 border-t"></div>
+        <div className="flex-1 h-px bg-gray-200"></div>
+
       </div>
 
       <div className="grid grid-cols-2 gap-4">
 
         <button
-          onClick={handleFacebook}
-          className="border rounded-xl py-3 hover:bg-blue-50 transition flex items-center justify-center gap-2"
+          onClick={loginGoogle}
+          className="border rounded-xl py-3 hover:bg-gray-50 transition"
         >
-          <img
-          src="/images/auth/Facebook_Logo.png"
-          alt="logo"
-          className="w-10 mx-auto mb-4"
-        />
 
-          Facebook
+          <img
+            src="/images/auth/google-logo.webp"
+            alt=""
+            className="w-6 mx-auto"
+          />
+
         </button>
 
         <button
-          onClick={handleGoogle}
-          className="border rounded-xl py-3 hover:bg-red-50 transition flex items-center justify-center gap-2"
+          onClick={loginFacebook}
+          className="border rounded-xl py-3 hover:bg-gray-50 transition"
         >
-          <img
-          src="/images/auth"
-          alt="logo"
-          className="w-10 mx-auto mb-4"
-        />
 
-          Google
+          <img
+            src="/images/auth/Facebook_Logo.png"
+            alt=""
+            className="w-6 mx-auto"
+          />
+
         </button>
 
       </div>
-    </>
+
+    </div>
   );
 };
 

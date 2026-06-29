@@ -1,99 +1,285 @@
 import {
   createContext,
-  useState,
   useContext,
   useEffect,
   useMemo,
-} from 'react';
+  useState,
+} from "react";
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // State user
   const [user, setUser] = useState(null);
 
-  // State loading để tránh render sai khi reload
   const [loading, setLoading] = useState(true);
 
-  // Load user từ localStorage khi khởi động app
+  // ==========================
+  // LOAD USER
+  // ==========================
+
   useEffect(() => {
     try {
-      const savedUser = localStorage.getItem('adminUser');
+      const savedUser = localStorage.getItem("user");
 
       if (savedUser) {
         setUser(JSON.parse(savedUser));
       }
-    } catch (error) {
-      console.error('Lỗi đọc dữ liệu user:', error);
-      localStorage.removeItem('adminUser');
+    } catch (err) {
+      console.error(err);
+      localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Hàm đăng nhập
-  const login = async (username, password) => {
-    try {
-      // Giả lập delay API
-      await new Promise((resolve) => setTimeout(resolve, 500));
+  // ==========================
+  // LOGIN
+  // ==========================
 
-      // Demo tài khoản admin
-      if (username === 'admin' && password === 'admin123') {
-        const adminData = {
+  const login = async (data) => {
+    try {
+      /**
+       * Sau này:
+       *
+       * const res = await authService.login(data)
+       */
+
+      await new Promise((r) => setTimeout(r, 800));
+
+      // Demo Admin
+
+      if (
+        data.email === "admin@gmail.com" &&
+        data.password === "admin123"
+      ) {
+        const admin = {
           id: 1,
-          username: 'admin',
-          role: 'admin',
-          name: 'Quản Trị Viên',
+          fullName: "Quản trị viên",
+          email: "admin@gmail.com",
+          role: "ADMIN",
+          provider: "LOCAL",
         };
 
-        setUser(adminData);
+        setUser(admin);
+
+        localStorage.setItem("user", JSON.stringify(admin));
+
+        localStorage.setItem("accessToken", "demo-access-token");
+
+        return {
+          success: true,
+        };
+      }
+
+      // Demo Customer
+
+      if (
+        data.email === "user@gmail.com" &&
+        data.password === "123456"
+      ) {
+        const customer = {
+          id: 2,
+          fullName: "Khách hàng",
+          email: "user@gmail.com",
+          role: "CUSTOMER",
+          provider: "LOCAL",
+        };
+
+        setUser(customer);
 
         localStorage.setItem(
-          'adminUser',
-          JSON.stringify(adminData)
+          "user",
+          JSON.stringify(customer)
+        );
+
+        localStorage.setItem(
+          "accessToken",
+          "demo-access-token"
         );
 
         return {
           success: true,
-          message: 'Đăng nhập thành công',
         };
       }
 
       return {
         success: false,
-        message: 'Sai tài khoản hoặc mật khẩu',
+        message: "Email hoặc mật khẩu không đúng.",
       };
-    } catch (error) {
-      console.error('Lỗi đăng nhập:', error);
-
+    } catch (err) {
       return {
         success: false,
-        message: 'Có lỗi xảy ra khi đăng nhập',
+        message: "Có lỗi xảy ra.",
       };
     }
   };
 
-  // Hàm đăng xuất
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('adminUser');
+  // ==========================
+  // REGISTER
+  // ==========================
+
+  const register = async (data) => {
+    try {
+      /**
+       * authService.register(data)
+       */
+
+      await new Promise((r) => setTimeout(r, 800));
+
+      console.log(data);
+
+      return {
+        success: true,
+        message: "Đăng ký thành công.",
+      };
+    } catch (err) {
+      return {
+        success: false,
+        message: "Đăng ký thất bại.",
+      };
+    }
   };
 
-  // Kiểm tra đã đăng nhập chưa
+  // ==========================
+  // FORGOT PASSWORD
+  // ==========================
+
+  const forgotPassword = async (email) => {
+    try {
+      /**
+       * authService.forgotPassword(email)
+       */
+
+      await new Promise((r) => setTimeout(r, 800));
+
+      console.log(email);
+
+      return {
+        success: true,
+        message: "Đã gửi OTP.",
+      };
+    } catch (err) {
+      return {
+        success: false,
+        message: "Không gửi được OTP.",
+      };
+    }
+  };
+
+  // ==========================
+  // VERIFY OTP
+  // ==========================
+
+  const verifyOTP = async (otp) => {
+    try {
+      await new Promise((r) => setTimeout(r, 800));
+
+      if (otp === "123456") {
+        return {
+          success: true,
+        };
+      }
+
+      return {
+        success: false,
+        message: "OTP không đúng.",
+      };
+    } catch {
+      return {
+        success: false,
+      };
+    }
+  };
+
+  // ==========================
+  // RESET PASSWORD
+  // ==========================
+
+  const resetPassword = async (data) => {
+    try {
+      await new Promise((r) => setTimeout(r, 800));
+
+      console.log(data);
+
+      return {
+        success: true,
+      };
+    } catch {
+      return {
+        success: false,
+      };
+    }
+  };
+
+  // ==========================
+  // SOCIAL LOGIN
+  // ==========================
+
+  const loginGoogle = async () => {
+    console.log("Google Login");
+  };
+
+  const loginFacebook = async () => {
+    console.log("Facebook Login");
+  };
+
+  // ==========================
+  // LOGOUT
+  // ==========================
+
+  const logout = () => {
+    setUser(null);
+
+    localStorage.removeItem("user");
+
+    localStorage.removeItem("accessToken");
+
+    localStorage.removeItem("refreshToken");
+  };
+
+  // ==========================
+  // ROLE
+  // ==========================
+
   const isAuthenticated = !!user;
 
-  // Kiểm tra quyền admin
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === "ADMIN";
 
-  // Memo để tối ưu re-render
+  const isSeller = user?.role === "SELLER";
+
+  const isCustomer = user?.role === "CUSTOMER";
+
   const value = useMemo(
     () => ({
       user,
+
       loading,
+
       login,
+
+      register,
+
       logout,
+
+      forgotPassword,
+
+      verifyOTP,
+
+      resetPassword,
+
+      loginGoogle,
+
+      loginFacebook,
+
       isAuthenticated,
+
       isAdmin,
+
+      isSeller,
+
+      isCustomer,
     }),
     [user, loading]
   );
@@ -105,15 +291,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Custom hook
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error(
-      'useAuth phải được sử dụng bên trong AuthProvider'
-    );
-  }
-
-  return context;
+  return useContext(AuthContext);
 };

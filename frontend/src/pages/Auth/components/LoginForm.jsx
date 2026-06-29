@@ -65,11 +65,7 @@ const LoginForm = ({ goRegister, goForgot }) => {
        * trong AuthContext là xong.
        */
 
-      const result = await login(
-        formData.email,
-        formData.password,
-        formData.remember
-      );
+      const result = await login(formData);
 
       if (!result.success) {
         setErrors({
