@@ -6,7 +6,11 @@ import {
   useState,
 } from "react";
 
+import axios from "axios";
+
 const AuthContext = createContext();
+
+const API = "http://localhost:8080/api/auth";
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -26,9 +30,9 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (err) {
       console.error(err);
+
       localStorage.removeItem("user");
       localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
     } finally {
       setLoading(false);
     }
@@ -39,79 +43,49 @@ export const AuthProvider = ({ children }) => {
   // ==========================
 
   const login = async (data) => {
+    console.log("===== LOGIN =====");
+    console.log(data);
+
     try {
-      /**
-       * Sau này:
-       *
-       * const res = await authService.login(data)
-       */
+      const res = await axios.post(`${API}/login`, {
+        email: data.email,
+        password: data.password,
+      });
 
-      await new Promise((r) => setTimeout(r, 800));
+      console.log("LOGIN SUCCESS");
+      console.log(res.data);
 
-      // Demo Admin
+      const loginUser = {
+        fullName: res.data.fullName,
+        email: res.data.email,
+        role: res.data.role,
+      };
 
-      if (
-        data.email === "admin@gmail.com" &&
-        data.password === "admin123"
-      ) {
-        const admin = {
-          id: 1,
-          fullName: "Quản trị viên",
-          email: "admin@gmail.com",
-          role: "ADMIN",
-          provider: "LOCAL",
-        };
+      setUser(loginUser);
 
-        setUser(admin);
+      localStorage.setItem(
+        "user",
+        JSON.stringify(loginUser)
+      );
 
-        localStorage.setItem("user", JSON.stringify(admin));
-
-        localStorage.setItem("accessToken", "demo-access-token");
-
-        return {
-          success: true,
-        };
-      }
-
-      // Demo Customer
-
-      if (
-        data.email === "user@gmail.com" &&
-        data.password === "123456"
-      ) {
-        const customer = {
-          id: 2,
-          fullName: "Khách hàng",
-          email: "user@gmail.com",
-          role: "CUSTOMER",
-          provider: "LOCAL",
-        };
-
-        setUser(customer);
-
-        localStorage.setItem(
-          "user",
-          JSON.stringify(customer)
-        );
-
-        localStorage.setItem(
-          "accessToken",
-          "demo-access-token"
-        );
-
-        return {
-          success: true,
-        };
-      }
+      localStorage.setItem(
+        "accessToken",
+        res.data.token
+      );
 
       return {
-        success: false,
-        message: "Email hoặc mật khẩu không đúng.",
+        success: true,
+        data: loginUser,
       };
     } catch (err) {
+      console.log("LOGIN ERROR");
+      console.log(err.response);
+
       return {
         success: false,
-        message: "Có lỗi xảy ra.",
+        message:
+          err.response?.data?.message ||
+          "Email hoặc mật khẩu không đúng.",
       };
     }
   };
@@ -121,108 +95,35 @@ export const AuthProvider = ({ children }) => {
   // ==========================
 
   const register = async (data) => {
+    console.log("===== REGISTER =====");
+    console.log(data);
+
     try {
-      /**
-       * authService.register(data)
-       */
+      const res = await axios.post(`${API}/register`, {
+        fullName: data.fullName,
+        email: data.email,
+        phone: data.phone,
+        password: data.password,
+      });
 
-      await new Promise((r) => setTimeout(r, 800));
-
-      console.log(data);
+      console.log("REGISTER SUCCESS");
+      console.log(res.data);
 
       return {
         success: true,
-        message: "Đăng ký thành công.",
+        data: res.data,
       };
     } catch (err) {
+      console.log("REGISTER ERROR");
+      console.log(err.response);
+
       return {
         success: false,
-        message: "Đăng ký thất bại.",
+        message:
+          err.response?.data?.message ||
+          "Đăng ký thất bại.",
       };
     }
-  };
-
-  // ==========================
-  // FORGOT PASSWORD
-  // ==========================
-
-  const forgotPassword = async (email) => {
-    try {
-      /**
-       * authService.forgotPassword(email)
-       */
-
-      await new Promise((r) => setTimeout(r, 800));
-
-      console.log(email);
-
-      return {
-        success: true,
-        message: "Đã gửi OTP.",
-      };
-    } catch (err) {
-      return {
-        success: false,
-        message: "Không gửi được OTP.",
-      };
-    }
-  };
-
-  // ==========================
-  // VERIFY OTP
-  // ==========================
-
-  const verifyOTP = async (otp) => {
-    try {
-      await new Promise((r) => setTimeout(r, 800));
-
-      if (otp === "123456") {
-        return {
-          success: true,
-        };
-      }
-
-      return {
-        success: false,
-        message: "OTP không đúng.",
-      };
-    } catch {
-      return {
-        success: false,
-      };
-    }
-  };
-
-  // ==========================
-  // RESET PASSWORD
-  // ==========================
-
-  const resetPassword = async (data) => {
-    try {
-      await new Promise((r) => setTimeout(r, 800));
-
-      console.log(data);
-
-      return {
-        success: true,
-      };
-    } catch {
-      return {
-        success: false,
-      };
-    }
-  };
-
-  // ==========================
-  // SOCIAL LOGIN
-  // ==========================
-
-  const loginGoogle = async () => {
-    console.log("Google Login");
-  };
-
-  const loginFacebook = async () => {
-    console.log("Facebook Login");
   };
 
   // ==========================
@@ -233,10 +134,7 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
 
     localStorage.removeItem("user");
-
     localStorage.removeItem("accessToken");
-
-    localStorage.removeItem("refreshToken");
   };
 
   // ==========================
@@ -263,16 +161,6 @@ export const AuthProvider = ({ children }) => {
 
       logout,
 
-      forgotPassword,
-
-      verifyOTP,
-
-      resetPassword,
-
-      loginGoogle,
-
-      loginFacebook,
-
       isAuthenticated,
 
       isAdmin,
@@ -291,6 +179,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);

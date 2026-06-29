@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import SocialLogin from "./SocialLogin";
 import { useAuth } from "../../../context/AuthContext";
 
 const LoginForm = ({ goRegister, goForgot }) => {
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -14,7 +15,7 @@ const LoginForm = ({ goRegister, goForgot }) => {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] =useState(false);
 
   const [errors, setErrors] = useState({});
 
@@ -55,27 +56,40 @@ const LoginForm = ({ goRegister, goForgot }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log("Submit");
+
     if (!validate()) return;
 
     try {
       setLoading(true);
 
-      /**
-       * Sau này chỉ cần sửa login()
-       * trong AuthContext là xong.
-       */
-
       const result = await login(formData);
 
-      if (!result.success) {
-        setErrors({
-          password: result.message,
-        });
+      console.log(result);
+
+      if (result.success) {
+        if (result.data.role === "ADMIN") {
+          navigate("/admin");
+        } else if (result.data.role === "SELLER") {
+          navigate("/seller");
+        } else {
+          navigate("/");
+        }
+
+        return;
       }
+
+      setErrors({
+        password: result.message,
+      });
+
     } catch (err) {
+      console.error(err);
+
       setErrors({
         password: "Có lỗi xảy ra. Vui lòng thử lại.",
       });
+
     } finally {
       setLoading(false);
     }
@@ -106,8 +120,6 @@ const LoginForm = ({ goRegister, goForgot }) => {
         className="space-y-5"
       >
 
-        {/* EMAIL */}
-
         <div>
 
           <label className="block mb-2 font-medium">
@@ -130,8 +142,6 @@ const LoginForm = ({ goRegister, goForgot }) => {
           )}
 
         </div>
-
-        {/* PASSWORD */}
 
         <div>
 
@@ -178,8 +188,6 @@ const LoginForm = ({ goRegister, goForgot }) => {
 
         </div>
 
-        {/* REMEMBER */}
-
         <div className="flex justify-between items-center">
 
           <label className="flex items-center gap-2">
@@ -206,8 +214,6 @@ const LoginForm = ({ goRegister, goForgot }) => {
           </button>
 
         </div>
-
-        {/* BUTTON */}
 
         <button
           disabled={loading}

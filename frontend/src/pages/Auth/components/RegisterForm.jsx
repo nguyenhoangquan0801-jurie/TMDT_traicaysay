@@ -81,20 +81,30 @@ const RegisterForm = ({ goLogin }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log("Đã bấm nút đăng ký");
+
     if (!validate()) return;
+
+    console.log("Validate OK");
 
     try {
       setLoading(true);
 
+      console.log(formData);
+
       const result = await register(formData);
 
-      if (result.success) {
-        alert("Đăng ký thành công!");
+      console.log(result);
 
-        goLogin();
+      if (result.success) {
+          alert("Đăng ký thành công!");
+
+          goLogin();
       } else {
-        alert(result.message);
+          alert(result.message);
       }
+    } catch (err) {
+        console.error(err);
     } finally {
       setLoading(false);
     }
