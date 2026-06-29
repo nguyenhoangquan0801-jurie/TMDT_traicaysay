@@ -13,12 +13,67 @@ import {
     AlertTriangle,
     ExternalLink
 } from 'lucide-react';
+import AddProductForm from './AddProductForm';
 
 const SellerProducts = () => {
-    // 1. Fetch states
+
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isError, setIsError] = useState(false);
+    const [isFormOpen, setIsFormOpen] = useState(false);
+    const [editingProduct, setEditingProduct] = useState(null);
+
+    const handleAddProduct = (newProduct) => {
+        if (editingProduct) {
+            const numericId = editingProduct.id.toString().replace('PROD-', '');
+            fetch(`http://localhost:8080/api/seller/products/${numericId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newProduct)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to update product');
+                return res.json();
+            })
+            .then(updatedProduct => {
+                setProducts(prev => prev.map(p => p.id === editingProduct.id ? updatedProduct : p));
+                setIsFormOpen(false);
+                setEditingProduct(null);
+            })
+            .catch(err => {
+                console.error('Error updating product:', err);
+                alert('Không thể cập nhật sản phẩm. Vui lòng thử lại.');
+            });
+        } else {
+            fetch('http://localhost:8080/api/seller/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newProduct)
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to add product');
+                return res.json();
+            })
+            .then(savedProduct => {
+                setProducts(prev => [savedProduct, ...prev]);
+                setIsFormOpen(false);
+            })
+            .catch(err => {
+                console.error('Error adding product:', err);
+                alert('Không thể thêm sản phẩm. Vui lòng thử lại.');
+            });
+        }
+    };
+
+    const openEditForm = (product) => {
+        setEditingProduct(product);
+        setIsFormOpen(true);
+    };
+
+    const closeForm = () => {
+        setIsFormOpen(false);
+        setEditingProduct(null);
+    };
 
     useEffect(() => {
         fetch('http://localhost:8080/api/seller/products')
@@ -37,7 +92,6 @@ const SellerProducts = () => {
             });
     }, []);
 
-    // 2. Interactive States
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [filterTab, setFilterTab] = useState('all');
@@ -54,8 +108,20 @@ const SellerProducts = () => {
 
     const handleDeleteProduct = (id) => {
         if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này không?')) {
-            setProducts(products.filter(p => p.id !== id));
-            setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+            const numericId = id.toString().replace('PROD-', '');
+            
+            fetch(`http://localhost:8080/api/seller/products/${numericId}`, {
+                method: 'DELETE'
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to delete product');
+                setProducts(products.filter(p => p.id !== id));
+                setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+            })
+            .catch(err => {
+                console.error('Error deleting product:', err);
+                alert('Không thể xóa sản phẩm. Vui lòng thử lại.');
+            });
         }
     };
 
@@ -94,7 +160,6 @@ const SellerProducts = () => {
         setSelectedIds([]);
     };
 
-    // 4. Filtering Logic
     const filteredProducts = products.filter(p => {
         const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
             p.sku.toLowerCase().includes(searchQuery.toLowerCase());
@@ -120,13 +185,21 @@ const SellerProducts = () => {
                     </p>
                 </div>
                 <button
-                    onClick={() => alert('Chức năng thêm sản phẩm mới sẽ hiển thị form.')}
+                    onClick={() => setIsFormOpen(true)}
                     className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-4 py-2 rounded-xl shadow-sm transition-all"
                 >
                     <Plus className="w-4 h-4" />
                     Thêm sản phẩm mới
                 </button>
             </div>
+
+            {/* Add Product Modal */}
+            <AddProductForm 
+                isOpen={isFormOpen} 
+                onClose={closeForm} 
+                onAddProduct={handleAddProduct}
+                editingProduct={editingProduct}
+            />
 
             {/* Error Banner */}
             {isError && (
@@ -346,7 +419,7 @@ const SellerProducts = () => {
                                             <div className="flex items-center justify-center gap-1">
 
                                                 <button
-                                                    onClick={() => alert(`Chỉnh sửa sản phẩm: ${p.name}`)}
+                                                    onClick={() => openEditForm(p)}
                                                     className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
                                                     title="Sửa thông tin"
                                                 >
