@@ -35,14 +35,27 @@ public class OrderController {
             Object totalAmountObj = payload.get("totalAmount");
             double totalAmount = (totalAmountObj != null) ? Double.parseDouble(totalAmountObj.toString()) : 0.0;
 
-            // Chèn dữ liệu vào bảng 'orders' và lấy ID 
-            String insertOrderSql = "INSERT INTO orders (user_id, total_amount, order_date, status) VALUES (?, ?, NOW(), 0)";
+            // Lấy thêm thông tin voucher từ React gửi lên
+            Object voucherCodeObj = payload.get("voucherCode");
+            String voucherCode = (voucherCodeObj != null) ? voucherCodeObj.toString() : null;
+
+            Object discountAmountObj = payload.get("discountAmount");
+            double discountAmount = (discountAmountObj != null) ? Double.parseDouble(discountAmountObj.toString()) : 0.0;
+
+            // 🟢 ĐÃ CHỈNH SỬA: Trả trạng thái lúc mới đặt hàng về 0 (Chờ xử lý / Chờ xác nhận) thay vì gán cứng bằng 1
+            String insertOrderSql = "INSERT INTO orders (user_id, total_amount, voucher_code, discount_amount, order_date, status) VALUES (?, ?, ?, ?, NOW(), 0)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection.prepareStatement(insertOrderSql, Statement.RETURN_GENERATED_KEYS);
                 ps.setLong(1, userId);
                 ps.setDouble(2, totalAmount);
+                if (voucherCode != null) {
+                    ps.setString(3, voucherCode);
+                } else {
+                    ps.setNull(3, java.sql.Types.VARCHAR);
+                }
+                ps.setDouble(4, discountAmount);
                 return ps;
             }, keyHolder);
 
@@ -89,18 +102,21 @@ public class OrderController {
             e.printStackTrace();
             response.put("success", false);
             response.put("message", "Lỗi xử lý lưu đơn hàng: " + e.getMessage());
-            return ResponseEntity.ok(response); // Trả về mã 200 kèm báo lỗi để trình duyệt không bị treo (Pending)
+            return ResponseEntity.ok(response);
         }
     }
 
     @SuppressWarnings("deprecation")
     @GetMapping
     public ResponseEntity<?> getAllOrders() {
-        // Lấy toàn bộ danh sách đơn hàng
+        // Lấy thêm voucher_code và discount_amount để trang History có thể hiển thị ra
         String sqlOrders = "SELECT id, " +
                 "id AS ma_don_hang, " +
                 "user_id, " +
                 "status, " +
+                "status AS trang_thai, " +                // 🟢 THÊM: Trả về cả biến tiếng Việt phòng trường hợp React của bạn dùng mapping này
+                "voucher_code AS voucherCode, " +     
+                "discount_amount AS discountAmount, " + // Trả về số tiền giảm 
                 "total_amount AS tong_thanh_toan, " +
                 "total_amount AS totalAmount, " +
                 "DATE_FORMAT(order_date, '%d/%m/%Y %H:%i') AS ngay_dat, " +
@@ -123,12 +139,51 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
+    @SuppressWarnings("deprecation")
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getOrdersByUserId(@PathVariable String userId) {
+        try {
+            String sqlOrders = "SELECT id, " +
+                    "id AS ma_don_hang, " +
+                    "user_id, " +
+                    "status, " +
+                    "status AS trang_thai, " +            // 🟢 THÊM: Trả về đồng bộ cột status gốc của bản ghi trong database cho React
+                    "voucher_code AS voucherCode, " +     
+                    "discount_amount AS discountAmount, " + // Trả về số tiền giảm 
+                    "total_amount AS tong_thanh_toan, " +
+                    "total_amount AS totalAmount, " +
+                    "DATE_FORMAT(order_date, '%d/%m/%Y %H:%i') AS ngay_dat, " +
+                    "DATE_FORMAT(order_date, '%d/%m/%Y %H:%i') AS orderDate " +
+                    "FROM orders WHERE user_id = ? ORDER BY id DESC";
+
+            List<Map<String, Object>> orders = jdbcTemplate.queryForList(sqlOrders, userId);
+
+            String sqlDetails = "SELECT product_id AS productId, name, image, quantity, (price + 0) AS price FROM order_details WHERE order_id = ?";
+
+            for (Map<String, Object> order : orders) {
+                Long orderId = Long.parseLong(order.get("id").toString());
+
+                // Lấy các sản phẩm thuộc về đơn hàng này
+                List<Map<String, Object>> items = jdbcTemplate.queryForList(sqlDetails, orderId);
+
+                order.put("items", items);
+            }
+
+            return ResponseEntity.ok(orders);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "Lỗi lấy lịch sử đơn hàng: " + e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
     // API CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG 
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // Lấy status mới từ React gửi lên 
             Object statusObj = body.get("status");
             if (statusObj == null) {
                 response.put("success", false);
@@ -138,7 +193,6 @@ public class OrderController {
             
             int newStatus = Integer.parseInt(statusObj.toString());
 
-            // Chạy lệnh SQL cập nhật cột status dựa trên ID đơn hàng
             String updateSql = "UPDATE orders SET status = ? WHERE id = ?";
             int rowsAffected = jdbcTemplate.update(updateSql, newStatus, id);
 

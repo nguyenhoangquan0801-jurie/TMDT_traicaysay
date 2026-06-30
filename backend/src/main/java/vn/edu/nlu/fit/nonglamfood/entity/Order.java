@@ -19,6 +19,12 @@ public class Order {
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
 
+    @Column(name = "voucher_code")
+    private String voucherCode; // Lưu mã voucher đã dùng
+
+    @Column(name = "discount_amount")
+    private BigDecimal discountAmount; // Số tiền được giảm
+
     private Integer status;
 
     @Column(name = "order_date")
@@ -29,51 +35,32 @@ public class Order {
     @JoinColumn(name = "order_id")
     private List<OrderDetail> items;
 
-    public Long getId() {
-        return id;
+    public String getVoucherCode() {
+        return voucherCode;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setVoucherCode(String voucherCode) {
+        this.voucherCode = voucherCode;
     }
 
-    public Long getUserId() {
-        return userId;
+    public BigDecimal getDiscountAmount() {
+        return discountAmount;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setDiscountAmount(BigDecimal discountAmount) {
+        this.discountAmount = discountAmount;
     }
-
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
-
-    public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
-
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getOrderDate() {
-        return orderDate;
-    }
-
-    public void setOrderDate(LocalDateTime orderDate) {
-        this.orderDate = orderDate;
-    }
-
-    public List<OrderDetail> getItems() {
-        return items;
-    }
-
-    public void setItems(List<OrderDetail> items) {
-        this.items = items; 
-    }
+  
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+    public BigDecimal getTotalAmount() { return totalAmount; }
+    public void setTotalAmount(BigDecimal totalAmount) { this.totalAmount = totalAmount; }
+    public Integer getStatus() { return status; }
+    public void setStatus(Integer status) { this.status = status; }
+    public LocalDateTime getOrderDate() { return orderDate; }
+    public void setOrderDate(LocalDateTime orderDate) { this.orderDate = orderDate; }
+    public List<OrderDetail> getItems() { return items; }
+    public void setItems(List<OrderDetail> items) { this.items = items; }
 }

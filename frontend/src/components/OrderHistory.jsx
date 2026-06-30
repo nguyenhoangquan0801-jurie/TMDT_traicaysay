@@ -55,7 +55,7 @@ const OrderHistory = () => {
   return (
     <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
       <h2 style={{ textAlign: 'center', color: '#2b9348', fontSize: '24px', fontWeight: 'bold' }}>
-        LỊCH SỬ ĐẶT HÀNG
+        ĐƠN HÀNG CỦA BẠN
       </h2>
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '20px' }}>
