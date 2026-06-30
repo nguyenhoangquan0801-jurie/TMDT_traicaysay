@@ -40,3 +40,15 @@ CREATE TABLE IF NOT EXISTS product_questions (
     -- FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
     FOREIGN KEY (parent_id) REFERENCES product_questions(id) ON DELETE CASCADE
 );
+
+-- Tạo bảng sản phẩm
+CREATE TABLE IF NOT EXISTS products (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL,
+    stock_quantity INT DEFAULT 0,
+    category VARCHAR(100),
+    image_url VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

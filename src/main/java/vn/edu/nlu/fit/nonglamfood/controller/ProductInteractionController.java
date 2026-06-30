@@ -44,33 +44,4 @@ public class ProductInteractionController {
         return ResponseEntity.ok(response);
     }
 
-    // 2. Tiếp nhận Câu hỏi mới (Gắn tag mặc định là 'PENDING' chờ duyệt)
-    @PostMapping("/question")
-    public String addQuestion(@RequestParam("productId") Long productId,
-                              @RequestParam("userName") String userName,
-                              @RequestParam("content") String content) {
-        ProductQuestion question = new ProductQuestion();
-        question.setProductId(productId);
-        question.setUserName(userName);
-        question.setContent(content);
-        question.setStatus("PENDING"); // Tag chờ trả lời
-        question.setAdminReply(false);
-        
-        questionRepository.save(question);
-        
-        // Quay lại trang chi tiết sản phẩm sau khi gửi câu hỏi xong
-        return "redirect:/product/" + productId;
-    }
-
-    // 3. API gợi ý câu hỏi tương tự khi khách đang gõ (Autocomplete)
-    @GetMapping("/question/autocomplete")
-    @ResponseBody
-    public ResponseEntity<List<ProductQuestion>> autocompleteQuestions(@RequestParam("productId") Long productId,
-                                                                       @RequestParam("keyword") String keyword) {
-        if (keyword == null || keyword.trim().length() < 2) {
-            return ResponseEntity.ok(List.of()); // Gõ dưới 2 ký tự thì chưa gợi ý
-        }
-        List<ProductQuestion> suggestions = questionRepository.searchSimilarQuestions(productId, keyword.trim());
-        return ResponseEntity.ok(suggestions);
-    }
 }

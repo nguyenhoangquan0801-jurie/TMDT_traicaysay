@@ -21,40 +21,43 @@ public class AdminQAController {
     // 1. Hiển thị trang danh sách câu hỏi chờ duyệt (status = 'PENDING')
     @GetMapping
     public String showPendingQuestions(Model model) {
-        // Lấy danh sách câu hỏi gốc đang chờ duyệt
         List<ProductQuestion> pendingQuestions = questionRepository.findByParentIsNullAndStatusOrderByCreatedAtDesc("PENDING");
         
+        // Debug: Kiểm tra xem list có bị null không
+        System.out.println("Số câu hỏi chờ duyệt: " + (pendingQuestions != null ? pendingQuestions.size() : "NULL"));
+        
         model.addAttribute("pendingQuestions", pendingQuestions);
-        return "admin/admin-qa"; // Đường dẫn tới file giao diện admin-qa.html
+        return "admin/admin-qa";
     }
 
     // 2. Khi Admin bấm Lưu: Sửa câu hỏi + Thêm câu trả lời + Gỡ tag PENDING
     @PostMapping("/reply")
     public String replyQuestion(@RequestParam("questionId") Long questionId,
-                                @RequestParam("productId") Long productId,
-                                @RequestParam("editedContent") String editedContent,
-                                @RequestParam("adminReply") String adminReply) {
-        
-        // BƯỚC A: Tìm và cập nhật lại câu hỏi gốc của khách (Sửa lỗi chính tả nếu có)
-        ProductQuestion question = questionRepository.findById(questionId)
-                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy câu hỏi với ID: " + questionId));
-        
-        question.setContent(editedContent); // Ghi đè nội dung đã sửa chính tả
-        question.setStatus("ANSWERED");    // Chuyển sang trạng thái Đã trả lời (Tự động gỡ tag PENDING)
+                            @RequestParam("productId") Long productId,
+                            @RequestParam("editedContent") String editedContent,
+                            @RequestParam("adminReply") String adminReply) {
+    
+    // Tìm câu hỏi cha
+    ProductQuestion question = questionRepository.findById(questionId)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid question Id: " + questionId));
+    
+    // Cập nhật câu hỏi gốc (chuẩn hóa nội dung)
+    question.setContent(editedContent);
+        question.setStatus("ANSWERED"); 
         questionRepository.save(question);
 
-        // BƯỚC B: Tạo bản ghi câu trả lời mới của Admin lồng vào câu hỏi cha
+        // Tạo câu trả lời mới
         ProductQuestion reply = new ProductQuestion();
         reply.setProductId(productId);
         reply.setUserName("Nonglamfood - Quản trị viên");
         reply.setContent(adminReply);
-        reply.setParent(question);         // Chỉ định thuộc về câu hỏi cha nào
+        reply.setParent(question);
         reply.setStatus("ANSWERED");
-        reply.setAdminReply(true);         // Xác nhận đây là Admin trả lời
+        reply.setAdminReply(true);
         
         questionRepository.save(reply);
 
-        // Quay lại trang quản lý câu hỏi sau khi lưu thành công
-        return "redirect:/admin/questions";
+        // Dùng redirect chính xác đến URL của controller này
+        return "redirect:/admin/qa?success";
     }
 }

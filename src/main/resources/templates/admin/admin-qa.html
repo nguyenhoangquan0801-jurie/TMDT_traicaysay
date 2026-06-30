@@ -33,17 +33,16 @@
     </style>
 </head>
 <body>
-
 <div class="admin-container">
     <h2 class="page-title">QUẢN LÝ THẮC MẮC CHỜ PHẢN HỒI</h2>
 
-    <div class="admin-qa-card" th:each="item : ${pendingQuestions}">
+    <div th:each="item : ${pendingQuestions}" class="admin-qa-card">
         
         <div class="product-info-header">
-            <img th:src="@{/assets/images/logo.png}" class="product-img" alt="Ảnh sản phẩm">
+            <img th:src="@{/assets/logo.png}" class="product-img" alt="Ảnh sản phẩm">
             <div>
-                <a th:href="@{/product/{id}(id=${item.productId})}" target="_blank" class="product-link">
-                    Mã sản phẩm hoặc Tên sản phẩm liên kết (ID: <span th:text="${item.productId}">123</span>)
+                <a th:href="@{/product/detail/{id}(id=${item.productId})}" target="_blank" class="product-link">
+                    Xem sản phẩm (ID: <span th:text="${item.productId}">123</span>)
                 </a>
                 <div style="font-size: 12px; color: #94a3b8; margin-top: 3px;">Hệ thống: Nonglamfood E-Commerce</div>
             </div>
@@ -53,24 +52,24 @@
         <div class="qa-handling-body">
             <div class="customer-meta">
                 👤 Người hỏi: <strong th:text="${item.userName}">Nguyễn Văn A</strong> 
-                • 🕒 Gửi lúc: <span th:text="${#annotations != null ? item.createdAt : 'Vừa xong'}">28/06/2026</span>
+                • 🕒 Gửi lúc: <span th:text="${#temporals.format(item.createdAt, 'dd/MM/yyyy HH:mm')}">28/06/2026</span>
             </div>
 
-            <form th:action="@{/admin/questions/reply}" method="POST">
-                <input type="hidden" name="questionId" th:value="${item.id}" />
-                <input type="hidden" name="productId" th:value="${item.productId}" />
-
+            <form th:action="@{/admin/qa/reply}" method="POST">
+                <input type="hidden" name="questionId" th:value="${item.id}">
+                <input type="hidden" name="productId" th:value="${item.productId}">
+                
                 <div class="form-group">
-                    <label>Nội dung câu hỏi của khách (Chỉnh sửa chuẩn chính tả nếu cần):</label>
-                    <input type="text" name="editedContent" th:value="${item.content}" class="input-control" required>
+                    <label>Chỉnh sửa câu hỏi (nếu cần):</label>
+                    <textarea name="editedContent" class="input-control" th:text="${item.content}" rows="2"></textarea>
                 </div>
-
+                
                 <div class="form-group">
-                    <label>Nội dung phản hồi từ ban quản trị Nonglamfood:</label>
-                    <textarea name="adminReply" rows="3" class="input-control" placeholder="Chào bạn, cảm ơn bạn đã quan tâm đến sản phẩm..." required style="resize: vertical;"></textarea>
+                    <label>Câu trả lời của bạn:</label>
+                    <textarea name="adminReply" class="input-control" placeholder="Nhập câu trả lời tại đây..." required rows="3"></textarea>
                 </div>
-
-                <div style="text-align: right;">
+                
+                <div style="text-align: right; margin-top: 15px;">
                     <button type="submit" class="btn-submit">
                         💾 Phản hồi & Duyệt hiển thị
                     </button>
@@ -80,7 +79,7 @@
     </div>
 
     <div class="empty-state" th:if="${#lists.isEmpty(pendingQuestions)}">
-        🎉 Tuyệt vời! Hiện tại không có thắc mắc nào đang chờ xử lý. Bạn đã hoàn thành sạch sẽ danh sách công việc!
+        🎉 Tuyệt vời! Hiện tại không có thắc mắc nào đang chờ xử lý.
     </div>
 </div>
 

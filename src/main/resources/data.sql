@@ -23,10 +23,26 @@ INSERT INTO reviews (product_id, user_name, rating_stars, content, created_at) V
 (1, 'Lê Thị Hồng', 4, 'Sản phẩm đóng gói đẹp, giao hàng nhanh. Trái cây sấy dẻo của Nonglamfood thì chất lượng khỏi bàn rồi.', '2026-06-26 14:30:00'),
 (2, 'Nguyễn Hoàng Long', 5, 'Xoài sấy dẻo miếng dày, dẻo quánh, thơm phức mùi xoài chín tự nhiên. Trái cây sấy dẻo nhà mình thích mê!', '2026-06-27 10:20:00');
 
-INSERT INTO product_questions (product_id, user_name, content, parent_id, status, is_admin_reply, created_at) VALUES
-(1, 'Hệ thống', 'Sản phẩm này có sử dụng chất bảo quản không?', NULL, 'POPULAR', FALSE, '2026-06-20 08:00:00'),
-(1, 'Hệ thống', 'Hạn sử dụng của vỏ bưởi sấy dẻo là bao lâu?', NULL, 'POPULAR', FALSE, '2026-06-20 08:05:00'),
-(2, 'Hệ thống', 'Người tiểu đường có ăn được xoài sấy dẻo không?', NULL, 'POPULAR', FALSE, '2026-06-20 08:10:00');
+-- 1. Trả lời cho câu hỏi: "Sản phẩm này có sử dụng chất bảo quản không?"
+INSERT INTO product_questions (product_id, user_name, content, parent_id, status, is_admin_reply, created_at) 
+VALUES (1, 'Nonglamfood - Quản trị viên', 
+'Sản phẩm của Nonglamfood cam kết 100% không sử dụng chất bảo quản, giữ nguyên hương vị tự nhiên của trái cây và đạt tiêu chuẩn an toàn thực phẩm.', 
+(SELECT id FROM product_questions WHERE content = 'Sản phẩm này có sử dụng chất bảo quản không?' AND status = 'POPULAR'), 
+'ANSWERED', TRUE, '2026-06-30 21:15:00');
+
+-- 2. Trả lời cho câu hỏi: "Hạn sử dụng của vỏ bưởi sấy dẻo là bao lâu?"
+INSERT INTO product_questions (product_id, user_name, content, parent_id, status, is_admin_reply, created_at) 
+VALUES (1, 'Nonglamfood - Quản trị viên', 
+'Vỏ bưởi sấy dẻo có hạn sử dụng 12 tháng kể từ ngày sản xuất khi chưa mở bao bì. Sau khi mở túi, bạn nên dùng hết trong vòng 1 tháng để đảm bảo chất lượng tốt nhất.', 
+(SELECT id FROM product_questions WHERE content = 'Hạn sử dụng của vỏ bưởi sấy dẻo là bao lâu?' AND status = 'POPULAR'), 
+'ANSWERED', TRUE, '2026-06-30 21:16:00');
+
+-- 3. Trả lời cho câu hỏi: "Người tiểu đường có ăn được xoài sấy dẻo không?"
+INSERT INTO product_questions (product_id, user_name, content, parent_id, status, is_admin_reply, created_at) 
+VALUES (2, 'Nonglamfood - Quản trị viên', 
+'Chào bạn, mặc dù là trái cây sấy tự nhiên, nhưng sản phẩm vẫn chứa hàm lượng đường tự nhiên từ xoài chín. Người tiểu đường nên hạn chế hoặc tham khảo ý kiến bác sĩ về khẩu phần ăn phù hợp ạ.', 
+(SELECT id FROM product_questions WHERE content = 'Người tiểu đường có ăn được xoài sấy dẻo không?' AND status = 'POPULAR'), 
+'ANSWERED', TRUE, '2026-06-30 21:17:00');
 
 INSERT INTO product_questions (product_id, user_name, content, parent_id, status, is_admin_reply, created_at) VALUES
 (1, 'Vũ Hoàng Yến', 'Sản phẩm này đạt tiêu chuẩn xuất khẩu sang châu Âu chưa shop?', NULL, 'ANSWERED', FALSE, '2026-06-24 15:00:00');
@@ -44,3 +60,12 @@ INSERT INTO product_questions (product_id, user_name, content, parent_id, status
 (1, 'Lê Hoài Nam', 'Shop ơiii, vỏ bưởi này bị sai lỗi chính tả trên bao bì à? Mình mún mua sll làm quà tặng có triết khấu ko?', NULL, 'PENDING', FALSE, '2026-06-28 14:00:00'),
 (2, 'Hoàng Thùy Linh', 'Xoài này có bị sượng hay nhìu sơ dừa không shop, răng yếu có nhai đc hk?', NULL, 'PENDING', FALSE, '2026-06-28 15:20:00'),
 (3, 'Nguyễn Thị Thảo', 'Mún mua chanh dây sấy dẻo ship ra Hà Nội thì mất bủi ngày vậy shop?', NULL, 'PENDING', FALSE, '2026-06-28 16:15:00');
+
+DELETE FROM products; -- Xóa cũ để làm mới
+
+INSERT INTO products (name, description, price, stock_quantity, category, image_url) VALUES
+('Vỏ bưởi sấy dẻo 100g', 'Vỏ bưởi thơm ngon, vị ngọt thanh', 45000, 100, 'Mới', '/assets/vobuoisaydeo.png'),
+('Xoài sấy dẻo thượng hạng', 'Xoài chín tự nhiên, dẻo quánh', 65000, 80, 'Mới', '/assets/xoaisaydeo.png'),
+('Thơm sấy dẻo', 'Dứa sấy dẻo thơm ngon', 0, 0, 'Trái cây sấy', '/assets/thomsaydeo.png'), -- Giá 0 vì là "Liên hệ"
+('Chanh dây sấy dẻo', 'Vị chua ngọt hài hòa', 50000, 50, 'Trái cây sấy', '/assets/chanhdaysaydeo.png'),
+('Đu đủ sấy dẻo', 'Đu đủ dẻo tự nhiên', 42000, 60, 'Trái cây sấy', '/assets/dudusaydeo.png');

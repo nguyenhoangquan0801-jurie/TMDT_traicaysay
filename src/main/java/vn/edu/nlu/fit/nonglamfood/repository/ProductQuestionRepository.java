@@ -1,5 +1,6 @@
 package vn.edu.nlu.fit.nonglamfood.repository;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param; //  Đúng chuẩn Spring Data JPA
@@ -14,8 +15,9 @@ public interface ProductQuestionRepository extends JpaRepository<ProductQuestion
     List<ProductQuestion> findByProductIdAndStatusAndParentIsNull(Long productId, String status);
 
     // 2. Lấy câu hỏi hiển thị công khai cho khách xem (Có parent là NULL và đã trả lời 'ANSWERED')
+    // Thêm @EntityGraph để lấy luôn danh sách replies chỉ trong 1 câu lệnh JOIN
+    @EntityGraph(attributePaths = {"replies"})
     List<ProductQuestion> findByProductIdAndStatusAndParentIsNullOrderByCreatedAtDesc(Long productId, String status);
-
     // 3. Tính năng gợi ý câu hỏi tương tự khi khách đang gõ (Autocomplete)
     // Tìm kiếm các câu hỏi gốc (parent_id IS NULL) chứa từ khóa mà khách gõ
     @Query("SELECT pq FROM ProductQuestion pq WHERE pq.productId = :productId " +
@@ -25,4 +27,6 @@ public interface ProductQuestionRepository extends JpaRepository<ProductQuestion
 
     // 4. Trang Admin hiển thị câu hỏi (Giống Shopee): Lấy câu hỏi gốc đang chờ duyệt (status = 'PENDING')
     List<ProductQuestion> findByParentIsNullAndStatusOrderByCreatedAtDesc(String status);
+
+    Iterable<ProductQuestion> findByProductIdAndContentContainingIgnoreCase(Long productId, String keyword);
 }

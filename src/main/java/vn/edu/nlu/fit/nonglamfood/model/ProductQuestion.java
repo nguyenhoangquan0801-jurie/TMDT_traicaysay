@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "product_questions")
+@Table(name = "product_questions", indexes = {
+    @Index(name = "idx_product_id", columnList = "product_id"),
+    @Index(name = "idx_parent_id", columnList = "parent_id")
+})
 public class ProductQuestion {
 
     @Id
@@ -67,4 +70,11 @@ public class ProductQuestion {
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    
+    // Thêm vào class ProductQuestion
+    public void addReply(ProductQuestion reply) {
+        replies.add(reply);
+        reply.setParent(this);
+    }
+
 }

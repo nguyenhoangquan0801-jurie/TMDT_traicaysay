@@ -8,13 +8,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute; // Thêm import để map DTO từ Form HTML
 import org.springframework.web.bind.annotation.PostMapping; // Thêm import để đón nhận phương thức POST (Submit Form)
 import vn.edu.nlu.fit.nonglamfood.dto.UserRegisterDTO; // Thêm import lớp hứng dữ liệu đăng ký
+import vn.edu.nlu.fit.nonglamfood.service.ProductService;
 import vn.edu.nlu.fit.nonglamfood.service.UserService; // Thêm import lớp nghiệp vụ xử lý đăng ký
-
 import java.security.Principal;
 
 @Controller // Đánh dấu lớp này là một Controller để Spring Boot tiếp nhận các yêu cầu (request) từ trình duyệt
 public class AuthController {
-
+    @Autowired
+    private ProductService productService;
     @Autowired
     private UserService userService; 
     // LỆNH MỚI: Tiêm lớp dịch vụ xử lý logic đăng ký tài khoản vào đây để sử dụng
@@ -51,7 +52,17 @@ public class AuthController {
             }   
             // ======================================================================
         }
+        // 2. Xử lý Sản phẩm (MỚI)
+        // Lấy toàn bộ sản phẩm từ Database
+        var allProducts = productService.getAllProducts();
         
+        // Lọc danh sách theo Category để truyền đúng vào các section
+        model.addAttribute("newProducts", allProducts.stream()
+                .filter(p -> "Mới".equals(p.getCategory())).toList());
+                
+        model.addAttribute("fruitProducts", allProducts.stream()
+                .filter(p -> "Trái cây sấy".equals(p.getCategory())).toList());
+            
         // Trả về giao diện có tên là "index" (Spring Boot tự tìm file src/main/resources/templates/index.html)
         return "index"; 
     }
