@@ -17,7 +17,13 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { cartCount } = useCart();
-  const {user,logout,isAdmin,isSeller,} = useAuth();
+  const {
+  user,
+  logout,
+  isAdmin,
+  isSeller,
+  isCustomer,
+} = useAuth();
   const location = useLocation();
 
   const openCart = useCallback(() => {
@@ -103,86 +109,119 @@ const Navbar = () => {
           </form>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-4">
-            {!user ? (
-              <Link
-                to="/login"
-                className="flex items-center gap-2 hover:text-emerald-600 transition-colors p-2"
-                >
-                <User size={22} />
-                <span className="hidden lg:block text-sm">
-                  Đăng nhập
-                </span>
-              </Link>
-            ) : (
-              <div className="flex items-center gap-3">
+<div className="flex items-center gap-4">
 
-                <span className="hidden lg:block text-sm font-medium">
-                    Xin chào, {user.fullName}
-                </span>
+  {!user ? (
+    <Link
+      to="/login"
+      className="flex items-center gap-2 hover:text-emerald-600 transition-colors p-2"
+    >
+      <User size={22} />
+      <span className="hidden lg:block text-sm">
+        Đăng nhập
+      </span>
+    </Link>
+  ) : (
+    <div className="relative group">
 
-                {isAdmin && (
-                  <Link
-                    to="/admin"
-                    className="text-sm text-blue-600 hover:underline"
-                  >
-                    Admin
-                  </Link>
-                )}
+      <button className="flex items-center gap-2 hover:text-emerald-600 transition-colors">
+        <User size={22} />
+        <span className="hidden lg:block text-sm font-medium">
+          {user.fullName}
+        </span>
+      </button>
 
-                {isSeller && (
-                  <Link
-                to="/seller"
-                className="text-sm text-green-600 hover:underline"
-                >
-                Seller
-                </Link>
-                )}
+      <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl border hidden group-hover:block overflow-hidden z-50">
 
-                <button
-                  onClick={logout}
-                  className="text-sm text-red-600 hover:underline"
-                >
-                  Đăng xuất
-                </button>
-
-              </div>
-            )}
-
-            <button
-              type="button"
-              onClick={openCart}
-              className="relative flex items-center gap-2 hover:text-emerald-600 transition-colors p-2"
-              aria-label={`Giỏ hàng${cartCount > 0 ? `, ${cartCount} sản phẩm` : ''}`}
-            >
-              <ShoppingCart size={26} strokeWidth={2} />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full shadow">
-                  {cartCount > 99 ? '99+' : cartCount}
-                </span>
-              )}
-            </button>
-
-            <button
-              type="button"
-              className="md:hidden p-2 text-gray-700 hover:text-emerald-600 transition-colors"
-              onClick={toggleSearch}
-              aria-label="Tìm kiếm"
-              aria-expanded={isSearchOpen}
-            >
-              <Search size={24} />
-            </button>
-
-            <button
-              type="button"
-              className="md:hidden p-2 text-gray-700 hover:text-emerald-600 transition-colors"
-              onClick={toggleMenu}
-              aria-label={isMenuOpen ? 'Đóng menu' : 'Mở menu'}
-              aria-expanded={isMenuOpen}
-            >
-              {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-            </button>
+        <div className="px-4 py-3 border-b">
+          <div className="font-semibold">
+            {user.fullName}
           </div>
+
+          <div className="text-xs text-gray-500">
+            {user.email}
+          </div>
+        </div>
+
+        {isAdmin && (
+          <Link
+            to="/admin"
+            className="block px-4 py-3 hover:bg-gray-100"
+          >
+            🛠 Quản trị hệ thống
+          </Link>
+        )}
+
+        {isSeller && (
+          <Link
+            to="/seller"
+            className="block px-4 py-3 hover:bg-gray-100"
+          >
+            🛒 Kênh người bán
+          </Link>
+        )}
+
+        {isCustomer && (
+          <>
+            <Link
+              to="/history"
+              className="block px-4 py-3 hover:bg-gray-100"
+            >
+              📦 Đơn hàng của tôi
+            </Link>
+
+            <Link
+              to="/profile"
+              className="block px-4 py-3 hover:bg-gray-100"
+            >
+              👤 Thông tin cá nhân
+            </Link>
+          </>
+        )}
+
+        <button
+          onClick={logout}
+          className="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50"
+        >
+          Đăng xuất
+        </button>
+
+      </div>
+
+    </div>
+  )}
+
+  <button
+    type="button"
+    onClick={openCart}
+    className="relative flex items-center gap-2 hover:text-emerald-600 transition-colors p-2"
+  >
+    <ShoppingCart size={26} strokeWidth={2} />
+
+    {cartCount > 0 && (
+      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full shadow">
+        {cartCount > 99 ? "99+" : cartCount}
+      </span>
+    )}
+  </button>
+
+  <button
+    type="button"
+    className="md:hidden p-2"
+    onClick={toggleSearch}
+  >
+    <Search size={24} />
+  </button>
+
+  <button
+    type="button"
+    className="md:hidden p-2"
+    onClick={toggleMenu}
+  >
+    {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+  </button>
+
+</div>
         </div>
 
         <nav className="hidden md:flex items-center gap-8 pb-5" aria-label="Menu chính">

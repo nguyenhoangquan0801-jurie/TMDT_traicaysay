@@ -41,13 +41,27 @@ public class SecurityConfig {
                         .authorizeHttpRequests(auth -> auth
 
                                 .requestMatchers(
-                                "/api/auth/**",
-                                "/oauth2/**",
-                                "/login/**"
-                        ).permitAll()
+                                        "/oauth2/**",
+                                        "/login/**",
+                                        "/api/auth/login",
+                                        "/api/auth/register",
+                                        "/api/auth/forgot-password",
+                                        "/api/auth/verify-otp",
+                                        "/api/auth/reset-password"
+                                ).permitAll()
 
-                        .anyRequest().authenticated()
-                )
+                                .requestMatchers("/api/admin/**")
+                                .hasRole("ADMIN")
+
+                                .requestMatchers("/api/seller/**")
+                                .hasRole("SELLER")
+
+                                .requestMatchers("/api/customer/**")
+                                .hasRole("CUSTOMER")
+
+                                .anyRequest()
+                                .authenticated()
+                        )
 
                 .oauth2Login(oauth -> oauth
 

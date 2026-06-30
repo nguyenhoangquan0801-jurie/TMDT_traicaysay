@@ -1,33 +1,33 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, } from 'react-router-dom';
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import { CartProvider } from './context/CartContext';
-import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from "./context/CartContext";
+import { AuthProvider } from "./context/AuthContext";
 
-import Navbar from './components/Navbar';
-import Cart from './components/Cart';
-import ScrollToTop from './components/ScrollToTop';
-import OrderHistory from './components/OrderHistory';
+import Navbar from "./components/Navbar";
+import Cart from "./components/Cart";
+import ScrollToTop from "./components/ScrollToTop";
+import OrderHistory from "./components/OrderHistory";
 
-import Home from './pages/Home';
-import ProductsPage from './pages/ProductsPage';
-import ProductDetail from './pages/ProductDetail';
-import CheckoutPage from './pages/CheckoutPage';
-import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
+import Home from "./pages/Home";
+import ProductsPage from "./pages/ProductsPage";
+import ProductDetail from "./pages/ProductDetail";
+import CheckoutPage from "./pages/CheckoutPage";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 
 import Auth from "./pages/Auth/Auth";
 import OAuth2Success from "./pages/OAuth2Success";
 
-import AdminLogin from './pages/admin/AdminLogin';
-import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminDashboard from "./pages/admin/AdminDashboard";
 
-import SellerLayout from './sellerPage/layouts/seller';
-import SellerDashboard from './sellerPage/pages/sellerDash';
-import SellerProducts from './sellerPage/pages/sellerProducts';
+import SellerLayout from "./sellerPage/layouts/seller";
+import SellerDashboard from "./sellerPage/pages/sellerDash";
+import SellerProducts from "./sellerPage/pages/sellerProducts";
 
-import PrivateRoute from './routes/PrivateRoute';
-
+import AdminRoute from "./routes/AdminRoute";
+import SellerRoute from "./routes/SellerRoute";
+import CustomerRoute from "./routes/CustomerRoute";
 
 const ClientLayout = ({ children }) => {
   return (
@@ -41,39 +41,10 @@ const ClientLayout = ({ children }) => {
 
 const NotFoundPage = () => {
   return (
-    <div
-      className="
-        min-h-screen
-        bg-gray-50
-        flex
-        items-center
-        justify-center
-        px-6
-      "
-    >
-      <div
-        className="
-          max-w-2xl
-          w-full
-          bg-white
-          border
-          border-gray-100
-          rounded-[40px]
-          p-12
-          text-center
-          shadow-xl
-        "
-      >
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-6">
+      <div className="max-w-2xl w-full bg-white border border-gray-100 rounded-[40px] p-12 text-center shadow-xl">
 
-        <div
-          className="
-            text-[120px]
-            md:text-[160px]
-            font-bold
-            leading-none
-            text-green-100
-          "
-        >
+        <div className="text-[120px] md:text-[160px] font-bold leading-none text-green-100">
           404
         </div>
 
@@ -81,38 +52,14 @@ const NotFoundPage = () => {
           Trang không tồn tại
         </h1>
 
-        <p
-          className="
-            text-gray-500
-            text-lg
-            leading-relaxed
-            mt-6
-            max-w-xl
-            mx-auto
-          "
-        >
+        <p className="text-gray-500 text-lg leading-relaxed mt-6 max-w-xl mx-auto">
           Trang bạn đang tìm kiếm có thể đã bị xóa,
           thay đổi đường dẫn hoặc hiện không khả dụng.
         </p>
 
         <a
           href="/"
-          className="
-            inline-flex
-            items-center
-            justify-center
-            mt-10
-            px-8
-            py-4
-            rounded-2xl
-            bg-green-600
-            hover:bg-green-700
-            text-white
-            font-semibold
-            transition-all
-            duration-300
-            shadow-lg
-          "
+          className="inline-flex items-center justify-center mt-10 px-8 py-4 rounded-2xl bg-green-600 hover:bg-green-700 text-white font-semibold transition-all duration-300 shadow-lg"
         >
           Quay về trang chủ
         </a>
@@ -163,18 +110,22 @@ function App() {
             <Route
               path="/checkout"
               element={
-                <ClientLayout>
-                  <CheckoutPage />
-                </ClientLayout>
+                <CustomerRoute>
+                  <ClientLayout>
+                    <CheckoutPage />
+                  </ClientLayout>
+                </CustomerRoute>
               }
             />
 
             <Route
               path="/history"
               element={
-                <ClientLayout>
-                  <OrderHistory />
-                </ClientLayout>
+                <CustomerRoute>
+                  <ClientLayout>
+                    <OrderHistory />
+                  </ClientLayout>
+                </CustomerRoute>
               }
             />
 
@@ -211,16 +162,11 @@ function App() {
             {/* ================= ADMIN ================= */}
 
             <Route
-              path="/admin/login"
-              element={<AdminLogin />}
-            />
-
-            <Route
               path="/admin"
               element={
-                <PrivateRoute roles={["ADMIN"]}>
+                <AdminRoute>
                   <AdminDashboard />
-                </PrivateRoute>
+                </AdminRoute>
               }
             />
 
@@ -229,11 +175,11 @@ function App() {
             <Route
               path="/seller"
               element={
-                <PrivateRoute roles={["SELLER"]}>
+                <SellerRoute>
                   <SellerLayout />
-                </PrivateRoute>
+                </SellerRoute>
               }
-              >
+            >
               <Route
                 index
                 element={<SellerDashboard />}
