@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 const AdminLogin = () => {
   const navigate = useNavigate();
 
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
 
   // STATES
   const [formData, setFormData] = useState({
@@ -18,10 +18,11 @@ const AdminLogin = () => {
 
   // REDIRECT IF LOGGED IN
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/admin');
+    if (isAuthenticated && !loading && user) {
+      if (Number(user.roleId) === 2) navigate('/seller');
+      else if (Number(user.roleId) === 3) navigate('/admin');
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, user, loading]);
 
   // HANDLE INPUT
   const handleChange = (e) => {
@@ -57,7 +58,14 @@ const AdminLogin = () => {
       );
 
       if (result.success) {
-        navigate('/admin');
+        const roleId = Number(result.roleId);
+        if (roleId === 2) {
+          navigate('/seller');
+        } else if (roleId === 3) {
+          navigate('/admin');
+        } else {
+          navigate('/');
+        }
       } else {
         setError(result.message);
       }

@@ -17,6 +17,12 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import SellerLayout from './sellerPage/layouts/seller';
 import SellerDashboard from './sellerPage/pages/sellerDash';
 import SellerProducts from './sellerPage/pages/sellerProducts';
+import SellerSettings from './sellerPage/pages/sellerSettings';
+import SellerOrder from './sellerPage/pages/sellerOrder';
+
+// =========================
+// ROUTE PROTECTION
+// =========================
 import PrivateRoute from './routes/PrivateRoute';
 
 const NotFoundPage = () => {
@@ -110,11 +116,22 @@ function App() {
           <ScrollToTop />
 
           <Routes>
+            {/*route của seller*/}
+            <Route
+              path="/seller"
+              element={
+                <PrivateRoute allowedRoles={[2]}>
+                  <SellerLayout />
+                </PrivateRoute>
+              }
+            >
 
             <Route path="/seller" element={<SellerLayout />}>
               <Route index element={<SellerDashboard />} />
               <Route path="dashboard" element={<SellerDashboard />} />
               <Route path="products" element={<SellerProducts />} />
+              <Route path="orders" element={<SellerOrder />} />
+              <Route path="settings" element={<SellerSettings />} />
             </Route>
 
             <Route
@@ -134,7 +151,16 @@ function App() {
                       <Route path="/about" element={<AboutPage />} />
                       <Route path="/contact" element={<ContactPage />} />
                       <Route path="/admin/login" element={<AdminLogin />} />
-                      <Route path="/admin" element={<PrivateRoute> <AdminDashboard /> </PrivateRoute>} />
+                      <Route
+                        path="/admin"
+                        element={
+                          <PrivateRoute allowedRoles={[3]}>
+                            <AdminDashboard />
+                          </PrivateRoute>
+                        }
+                      />
+
+                      {/* 404 PAGE */}
                       <Route path="*" element={<NotFoundPage />} />
                     </Routes>
                   </main>

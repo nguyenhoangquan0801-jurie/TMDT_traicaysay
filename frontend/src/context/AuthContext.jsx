@@ -34,41 +34,41 @@ export const AuthProvider = ({ children }) => {
   // Hàm đăng nhập
   const login = async (username, password) => {
     try {
-      // Giả lập delay API
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
 
-      // Demo tài khoản admin
-      if (username === 'admin' && password === 'admin123') {
-        const adminData = {
-          id: 1,
-          username: 'admin',
-          role: 'admin',
-          name: 'Quản Trị Viên',
+      const data = await response.json();
+
+      if (data.success) {
+        const userData = {
+          username: data.username,
+          role: data.role,
+          roleId: data.roleId,
+          name: data.role === 'ADMIN' ? 'Quản Trị Viên' : 'Chủ Shop',
         };
 
-        setUser(adminData);
-
-        localStorage.setItem(
-          'adminUser',
-          JSON.stringify(adminData)
-        );
+        setUser(userData);
+        localStorage.setItem('adminUser', JSON.stringify(userData));
 
         return {
           success: true,
-          message: 'Đăng nhập thành công',
+          message: data.message,
+          roleId: data.roleId
         };
       }
 
       return {
         success: false,
-        message: 'Sai tài khoản hoặc mật khẩu',
+        message: data.message || 'Sai tài khoản hoặc mật khẩu',
       };
     } catch (error) {
       console.error('Lỗi đăng nhập:', error);
-
       return {
         success: false,
-        message: 'Có lỗi xảy ra khi đăng nhập',
+        message: 'Không thể kết nối đến máy chủ',
       };
     }
   };
@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }) => {
   const isAuthenticated = !!user;
 
   // Kiểm tra quyền admin
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === 'ADMIN';
 
   // Memo để tối ưu re-render
   const value = useMemo(

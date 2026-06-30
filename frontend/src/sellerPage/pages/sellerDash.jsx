@@ -17,6 +17,8 @@ import {
   ServerCrash
 } from 'lucide-react';
 
+import { useAuth } from '../../context/AuthContext';
+
 // ─── Helper: format axis numbers ──────────────────────────────────────────────
 const formatYAxis = (value) => {
   if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
@@ -43,6 +45,7 @@ const FetchError = ({ label }) => (
 
 // ─── Main component ───────────────────────────────────────────────────────────
 const SellerDashboard = () => {
+  const { user } = useAuth();
   const [timeRange, setTimeRange]     = useState('week');
   const [hoveredBar, setHoveredBar]   = useState(null);
 
@@ -85,43 +88,53 @@ const SellerDashboard = () => {
 
   // ── Fetch KPI ─────────────────────────────────────────────────────────────
   useEffect(() => {
-    fetch('http://localhost:8080/api/seller/dashboard/kpi')
-      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-      .then(d => { setKpiData(d); setKpiLoading(false); })
-      .catch(e => { console.error('KPI fetch failed:', e); setKpiError(true); setKpiLoading(false); });
-  }, []);
+    if (user?.username) {
+      fetch(`http://localhost:8080/api/seller/dashboard/kpi?username=${user.username}`)
+        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+        .then(d => { setKpiData(d); setKpiLoading(false); })
+        .catch(e => { console.error('KPI fetch failed:', e); setKpiError(true); setKpiLoading(false); });
+    }
+  }, [user]);
 
   // ── Fetch todo counts ─────────────────────────────────────────────────────
   useEffect(() => {
-    fetch('http://localhost:8080/api/seller/dashboard/todo')
-      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-      .then(d => { setTodoItems(d); setTodoLoading(false); })
-      .catch(e => { console.error('Todo fetch failed:', e); setTodoError(true); setTodoLoading(false); });
-  }, []);
+    if (user?.username) {
+      fetch(`http://localhost:8080/api/seller/dashboard/todo?username=${user.username}`)
+        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+        .then(d => { setTodoItems(d); setTodoLoading(false); })
+        .catch(e => { console.error('Todo fetch failed:', e); setTodoError(true); setTodoLoading(false); });
+    }
+  }, [user]);
 
   // ── Fetch chart data ──────────────────────────────────────────────────────
   useEffect(() => {
-    fetch(`http://localhost:8080/api/seller/dashboard/chart?range=${timeRange}`)
-      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-      .then(d => { setChartData(d); setChartLoading(false); })
-      .catch(e => { console.error('Chart fetch failed:', e); setChartError(true); setChartLoading(false); });
-  }, [timeRange]);
+    if (user?.username) {
+      fetch(`http://localhost:8080/api/seller/dashboard/chart?range=${timeRange}&username=${user.username}`)
+        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+        .then(d => { setChartData(d); setChartLoading(false); })
+        .catch(e => { console.error('Chart fetch failed:', e); setChartError(true); setChartLoading(false); });
+    }
+  }, [timeRange, user]);
 
   // ── Fetch recent orders ───────────────────────────────────────────────────
   useEffect(() => {
-    fetch('http://localhost:8080/api/seller/orders/recent')
-      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-      .then(d => { setRecentOrders(d); setOrdersLoading(false); })
-      .catch(e => { console.error('Orders fetch failed:', e); setOrdersError(true); setOrdersLoading(false); });
-  }, []);
+    if (user?.username) {
+      fetch(`http://localhost:8080/api/seller/orders/recent?username=${user.username}`)
+        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+        .then(d => { setRecentOrders(d); setOrdersLoading(false); })
+        .catch(e => { console.error('Orders fetch failed:', e); setOrdersError(true); setOrdersLoading(false); });
+    }
+  }, [user]);
 
   // ── Fetch low-stock alerts ────────────────────────────────────────────────
   useEffect(() => {
-    fetch('http://localhost:8080/api/seller/products/low-stock')
-      .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-      .then(d => { setStockAlerts(d); setStockLoading(false); })
-      .catch(e => { console.error('Stock fetch failed:', e); setStockError(true); setStockLoading(false); });
-  }, []);
+    if (user?.username) {
+      fetch(`http://localhost:8080/api/seller/products/low-stock?username=${user.username}`)
+        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+        .then(d => { setStockAlerts(d); setStockLoading(false); })
+        .catch(e => { console.error('Stock fetch failed:', e); setStockError(true); setStockLoading(false); });
+    }
+  }, [user]);
 
   // ── Derived chart values ──────────────────────────────────────────────────
   const activeKPIs  = kpiData?.[timeRange] ?? [];
