@@ -11,9 +11,9 @@ const Cart = () => {
     const [isAnimating, setIsAnimating] = useState(false);
     const [removingId, setRemovingId] = useState(null);
 
-    // Total quantity (not just unique items)
-    const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
-
+    // Total quantity 
+    const totalItems = cart.length;
+    
     // Open with animation
     const handleOpenCart = useCallback(() => {
         setIsOpen(true);
@@ -60,9 +60,11 @@ const Cart = () => {
     };
 
     const handleCheckout = () => {
-        closeCart();
-        // Small delay to let cart close animation finish
-        setTimeout(() => navigate('/checkout'), 300);
+        if (cart.length === 0) return;
+        
+        closeCart(); // Đóng giỏ hàng 
+        
+        setTimeout(() => navigate('/checkout'), 300); 
     };
 
     if (!isOpen) return null;
@@ -96,8 +98,8 @@ const Cart = () => {
 
                 {/* Cart Items */}
                 <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                    {cart.length === 0 ? (
-                        <EmptyCart onClose={closeCart} />
+                    {cart.length === 0 ? (                       
+                        <EmptyCart onClose={closeCart} navigate={navigate} />
                     ) : (
                         cart.map(item => {
                             if (!item?.id) return null;
@@ -126,21 +128,18 @@ const Cart = () => {
     );
 };
 
-// Sub-components
 const CartHeader = ({ totalItems, onClose, onClear, hasItems }) => (
     <div className="flex items-center justify-between p-6 border-b bg-white sticky top-0">
         <div className="flex items-center gap-3">
             <ShoppingCart className="text-green-600" size={24} />
             <h2 className="text-2xl font-bold text-green-700">
                 Giỏ hàng
-                {/* Shows total quantity, not unique items */}
                 <span className="ml-2 text-sm font-normal text-gray-500">
                     ({totalItems} sản phẩm)
                 </span>
             </h2>
         </div>
         <div className="flex items-center gap-2">
-            {/* Clear all button */}
             {hasItems && (
                 <button 
                     onClick={onClear}
@@ -162,7 +161,6 @@ const CartHeader = ({ totalItems, onClose, onClear, hasItems }) => (
     </div>
 );
 
-// Extracted CartItem component
 const CartItem = ({ item, isRemoving, onRemove, onUpdateQuantity }) => {
     const subtotal = (item.price || 0) * (item.quantity || 1);
 
@@ -170,7 +168,6 @@ const CartItem = ({ item, isRemoving, onRemove, onUpdateQuantity }) => {
         <div className={`flex gap-4 border-b pb-4 transition-all duration-300 ${
             isRemoving ? 'opacity-0 scale-95 -translate-x-4' : 'opacity-100 scale-100'
         }`}>
-            {/* Product Image / Placeholder */}
             <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-emerald-500 
                             rounded-2xl flex items-center justify-center text-4xl 
                             text-white font-bold shrink-0">
@@ -186,17 +183,14 @@ const CartItem = ({ item, isRemoving, onRemove, onUpdateQuantity }) => {
             </div>
 
             <div className="flex-1 min-w-0">
-                {/* Name */}
                 <h4 className="font-semibold text-gray-800 truncate">
                     {item.name || 'Sản phẩm không xác định'}
                 </h4>
 
-                {/* Unit price */}
                 <p className="text-gray-400 text-sm mt-0.5">
-                    {Number(item.price || 0).toLocaleString('vi-VN')}đ / sản phẩm
+                    {Number(item.price || 0).toLocaleString('vi-VN')}đ 
                 </p>
 
-                {/* Quantity controls */}
                 <div className="flex items-center gap-3 mt-2">
                     <QuantityButton
                         onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
@@ -217,14 +211,12 @@ const CartItem = ({ item, isRemoving, onRemove, onUpdateQuantity }) => {
                         <Plus size={12} />
                     </QuantityButton>
 
-                    {/* Subtotal per item */}
                     <span className="ml-auto text-green-600 font-bold text-sm">
                         {subtotal.toLocaleString('vi-VN')}đ
                     </span>
                 </div>
             </div>
 
-            {/* Remove button */}
             <button 
                 onClick={() => onRemove(item.id)} 
                 className="text-red-400 hover:text-red-600 p-1 hover:bg-red-50 
@@ -237,7 +229,6 @@ const CartItem = ({ item, isRemoving, onRemove, onUpdateQuantity }) => {
     );
 };
 
-// Reusable quantity button
 const QuantityButton = ({ children, disabled, onClick, ...props }) => (
     <button
         onClick={onClick}
@@ -254,8 +245,7 @@ const QuantityButton = ({ children, disabled, onClick, ...props }) => (
     </button>
 );
 
-// Empty state component
-const EmptyCart = ({ onClose }) => (
+const EmptyCart = ({ onClose, navigate }) => (
     <div className="flex flex-col items-center justify-center h-full gap-4 py-16">
         <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center">
             <ShoppingCart size={40} className="text-gray-300" />
@@ -265,25 +255,25 @@ const EmptyCart = ({ onClose }) => (
             Hãy thêm sản phẩm vào giỏ hàng của bạn
         </p>
         <button
-            onClick={onClose}
+            onClick={() => {
+                onClose(); 
+                navigate('/products'); 
+            }}
             className="mt-2 text-green-600 hover:text-green-700 font-medium 
-                       flex items-center gap-1"
+                       flex items-center gap-1 cursor-pointer"
         >
             Tiếp tục mua sắm <ArrowRight size={16} />
         </button>
     </div>
 );
 
-// Footer with total
 const CartFooter = ({ cartTotal, onCheckout }) => (
     <div className="p-6 border-t bg-gray-50">
-        {/* Subtotal row */}
         <div className="flex justify-between text-sm text-gray-500 mb-2">
             <span>Tạm tính:</span>
             <span>{Number(cartTotal || 0).toLocaleString('vi-VN')}đ</span>
         </div>
 
-        {/* Shipping note */}
         <div className="flex justify-between text-sm text-gray-500 mb-4">
             <span>Phí vận chuyển:</span>
             <span className="text-green-600 font-medium">Miễn phí</span>

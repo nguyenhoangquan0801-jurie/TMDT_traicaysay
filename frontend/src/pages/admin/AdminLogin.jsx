@@ -245,38 +245,6 @@ const AdminLogin = () => {
             </button>
           </form>
 
-          {/* DEMO ACCOUNT */}
-          <div
-            className="
-              mt-8
-              rounded-2xl
-              bg-gray-50
-              border
-              border-gray-100
-              p-5
-            "
-          >
-            <p className="text-sm font-semibold text-gray-700 mb-2">
-              Tài khoản demo
-            </p>
-
-            <div className="text-sm text-gray-500 space-y-1">
-              <p>
-                Username:{' '}
-                <span className="font-semibold text-gray-700">
-                  admin
-                </span>
-              </p>
-
-              <p>
-                Password:{' '}
-                <span className="font-semibold text-gray-700">
-                  admin123
-                </span>
-              </p>
-            </div>
-          </div>
-
           {/* FOOTER */}
           <p className="text-center text-sm text-gray-400 mt-8">
             Hệ thống quản trị cửa hàng

@@ -1,28 +1,14 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, } from 'react';
 
-// =========================
-// CREATE CONTEXT
-// =========================
 const CartContext = createContext(null);
 
-// =========================
-// PROVIDER
-// =========================
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
+  // State lưu danh sách đơn hàng động
+  const [orders, setOrders] = useState([]);
 
-  // Loading state
   const [loading, setLoading] = useState(true);
 
-  // =========================
-  // LOAD CART
-  // =========================
   useEffect(() => {
     try {
       const savedCart = localStorage.getItem('cart');
@@ -30,23 +16,32 @@ export const CartProvider = ({ children }) => {
       if (savedCart) {
         setCart(JSON.parse(savedCart));
       }
+
+      // Tải đơn hàng cũ từ localStorage 
+      const savedOrders = localStorage.getItem('orders');
+      if (savedOrders) {
+        setOrders(JSON.parse(savedOrders));
+      }
     } catch (error) {
-      console.error('Lỗi đọc giỏ hàng:', error);
+      console.error('Lỗi đọc dữ liệu:', error);
       localStorage.removeItem('cart');
+      localStorage.removeItem('orders');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // SAVE CART
+  // SAVE CART & ORDERS
   useEffect(() => {
     if (!loading) {
       localStorage.setItem('cart', JSON.stringify(cart));
+      // Tự động lưu danh sách đơn hàng vào localStorage khi có đơn mới
+      localStorage.setItem('orders', JSON.stringify(orders));
     }
-  }, [cart, loading]);
+  }, [cart, orders, loading]); // Theo dõi biến orders 
 
-  // ADD TO CART
-  const addToCart = (product) => {
+  // Thêm tham số `amount` và mặc định bằng 1 nếu không truyền vào
+  const addToCart = (product, amount = 1) => {
     if (!product || !product.id) {
       console.error('Sản phẩm không hợp lệ');
       return;
@@ -57,24 +52,24 @@ export const CartProvider = ({ children }) => {
         (item) => item.id === product.id
       );
 
-      // Nếu đã tồn tại -> tăng số lượng
+      // Nếu đã tồn tại -> cộng dồn với số lượng thực tế được truyền vào
       if (existingProduct) {
         return prevCart.map((item) =>
           item.id === product.id
             ? {
-                ...item,
-                quantity: item.quantity + 1,
-              }
+              ...item,
+              quantity: item.quantity + amount,
+            }
             : item
         );
       }
 
-      // Nếu chưa tồn tại -> thêm mới
+      // Nếu chưa tồn tại -> thêm mới với số lượng thực tế được truyền vào
       return [
         ...prevCart,
         {
           ...product,
-          quantity: 1,
+          quantity: amount,
         },
       ];
     });
@@ -99,9 +94,9 @@ export const CartProvider = ({ children }) => {
       prevCart.map((item) =>
         item.id === id
           ? {
-              ...item,
-              quantity,
-            }
+            ...item,
+            quantity,
+          }
           : item
       )
     );
@@ -113,9 +108,9 @@ export const CartProvider = ({ children }) => {
       prevCart.map((item) =>
         item.id === id
           ? {
-              ...item,
-              quantity: item.quantity + 1,
-            }
+            ...item,
+            quantity: item.quantity + 1,
+          }
           : item
       )
     );
@@ -128,9 +123,9 @@ export const CartProvider = ({ children }) => {
         .map((item) =>
           item.id === id
             ? {
-                ...item,
-                quantity: item.quantity - 1,
-              }
+              ...item,
+              quantity: item.quantity - 1,
+            }
             : item
         )
         .filter((item) => item.quantity > 0)
@@ -153,17 +148,37 @@ export const CartProvider = ({ children }) => {
 
   // TOTAL COUNT
   const cartCount = useMemo(() => {
-    return cart.reduce(
-      (total, item) => total + item.quantity,
-      0
-    );
+    return cart.length;
   }, [cart]);
 
-  // CONTEXT VALUE
+  const addOrderFromCart = (cartItems, totalPrice) => {
+    if (!cartItems || cartItems.length === 0) return;
+
+    const newOrder = {
+      id: Math.floor(Math.random() * 900) + 103,
+      totalAmount: totalPrice,
+      orderDate: new Date().toLocaleDateString('vi-VN'),
+
+      status: 1,
+
+      items: cartItems.map(item => ({
+        id: item.id,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price
+      }))
+    };
+
+    setOrders(prevOrders => [newOrder, ...prevOrders]);
+  };
+
   const value = useMemo(
     () => ({
       cart,
       loading,
+      orders,
+      setOrders,
+      addOrderFromCart,
 
       addToCart,
       removeFromCart,
@@ -177,7 +192,7 @@ export const CartProvider = ({ children }) => {
       cartTotal,
       cartCount,
     }),
-    [cart, loading, cartTotal, cartCount]
+    [cart, loading, orders, cartTotal, cartCount]
   );
 
   return (
@@ -187,7 +202,6 @@ export const CartProvider = ({ children }) => {
   );
 };
 
-// CUSTOM HOOK
 export const useCart = () => {
   const context = useContext(CartContext);
 
@@ -200,7 +214,5 @@ export const useCart = () => {
   return context;
 };
 
-// EXPORT
 export { CartContext };
-
 export default CartContext;

@@ -6,6 +6,7 @@ import { useCart } from '../context/CartContext';
 const NAV_LINKS = [
   { path: '/', label: 'Trang chủ' },
   { path: '/products', label: 'Sản phẩm' },
+  { path: '/history', label: 'Đơn hàng' }, 
   { path: '/about', label: 'Câu chuyện' },
   { path: '/contact', label: 'Liên hệ' },
 ];
@@ -38,7 +39,7 @@ const Navbar = () => {
   const handleSearchSubmit = useCallback((e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Xử lý tìm kiếm ở đây
+      // Xử lý tìm kiếm 
       console.log('Searching:', searchQuery);
     }
   }, [searchQuery]);
@@ -73,7 +74,6 @@ const Navbar = () => {
             </div>
           </Link>
 
-          {/* Search Bar - Desktop */}
           <form 
             onSubmit={handleSearchSubmit}
             className="hidden md:flex flex-1 max-w-xl mx-8"
@@ -108,9 +108,6 @@ const Navbar = () => {
               aria-label="Tài khoản"
             >
               <User size={24} strokeWidth={2} />
-              <span className="hidden lg:block text-sm font-medium">
-                Tài khoản
-              </span>
             </Link>
 
             <button
@@ -127,7 +124,6 @@ const Navbar = () => {
               )}
             </button>
 
-            {/* Mobile Buttons */}
             <button
               type="button"
               className="md:hidden p-2 text-gray-700 hover:text-emerald-600 transition-colors"
@@ -150,7 +146,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8 pb-5" aria-label="Menu chính">
           {NAV_LINKS.map(({ path, label }) => (
             <Link key={path} to={path} className={linkClasses(path)}>
@@ -159,7 +154,6 @@ const Navbar = () => {
           ))}
         </nav>
 
-        {/* Mobile Search */}
         {isSearchOpen && (
           <form onSubmit={handleSearchSubmit} className="md:hidden pb-4">
             <label htmlFor="mobile-search" className="sr-only">
@@ -177,7 +171,6 @@ const Navbar = () => {
           </form>
         )}
 
-        {/* Mobile Menu */}
         {isMenuOpen && (
           <nav className="md:hidden border-t py-6 bg-white" aria-label="Menu mobile">
             <ul className="flex flex-col gap-1 px-2">
