@@ -6,6 +6,8 @@ public interface AuthService {
 
     UserResponse register(RegisterRequest request);
 
+    UserResponse getCurrentUser(String email);
+
     LoginResponse login(LoginRequest request);
 
     void forgotPassword(String email);

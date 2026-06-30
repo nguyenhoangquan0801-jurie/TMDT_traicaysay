@@ -38,7 +38,6 @@ public class JwtUtil {
 
     // Lấy email
     public String extractEmail(String token) {
-
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getKey())
                 .build()

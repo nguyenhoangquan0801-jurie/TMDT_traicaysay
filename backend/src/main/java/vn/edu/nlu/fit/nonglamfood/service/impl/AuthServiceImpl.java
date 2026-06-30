@@ -61,6 +61,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(user.getEmail())
                 .phone(user.getPhone())
                 .avatar(user.getAvatar())
+                .role(user.getRole().getRoleName())
                 .build();
     }
     @Override
@@ -111,5 +112,20 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
+    }
+    @Override
+    public UserResponse getCurrentUser(String email) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user"));
+
+        return UserResponse.builder()
+                .userId(user.getUserId())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .avatar(user.getAvatar())
+                .role(user.getRole().getRoleName())
+                .build();
     }
 }

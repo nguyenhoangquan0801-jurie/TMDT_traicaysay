@@ -125,6 +125,22 @@ export const AuthProvider = ({ children }) => {
       };
     }
   };
+  // ==========================
+  // GOOGLE LOGIN
+    // ==========================
+
+  const loginGoogle = () => {
+    window.location.href =
+      "http://localhost:8080/oauth2/authorization/google";
+  };
+
+  // ==========================
+  // FACEBOOK LOGIN
+  // ==========================
+
+  const loginFacebook = () => {
+    alert("Facebook Login đang phát triển.");
+  };
 
   // ==========================
   // LOGOUT
@@ -148,25 +164,27 @@ export const AuthProvider = ({ children }) => {
   const isSeller = user?.role === "SELLER";
 
   const isCustomer = user?.role === "CUSTOMER";
+  const loginGoogle = () => {
+    window.location.href =
+        "http://localhost:8080/oauth2/authorization/google";
+  };
+
 
   const value = useMemo(
     () => ({
       user,
-
       loading,
 
       login,
-
       register,
-
       logout,
 
+      loginGoogle,
+      loginFacebook,
+
       isAuthenticated,
-
       isAdmin,
-
       isSeller,
-
       isCustomer,
     }),
     [user, loading]

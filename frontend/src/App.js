@@ -1,24 +1,33 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, } from 'react-router-dom';
+
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
+
 import Navbar from './components/Navbar';
 import Cart from './components/Cart';
 import ScrollToTop from './components/ScrollToTop';
+import OrderHistory from './components/OrderHistory';
+
 import Home from './pages/Home';
 import ProductsPage from './pages/ProductsPage';
 import ProductDetail from './pages/ProductDetail';
 import CheckoutPage from './pages/CheckoutPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
-import OrderHistory from './components/OrderHistory';
+
 import Auth from "./pages/Auth/Auth";
+import OAuth2Success from "./pages/OAuth2Success";
+
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
+
 import SellerLayout from './sellerPage/layouts/seller';
 import SellerDashboard from './sellerPage/pages/sellerDash';
 import SellerProducts from './sellerPage/pages/sellerProducts';
+
 import PrivateRoute from './routes/PrivateRoute';
+
 
 const ClientLayout = ({ children }) => {
   return (
@@ -192,6 +201,11 @@ function App() {
             <Route
               path="/login"
               element={<Auth />}
+            />
+
+            <Route
+              path="/oauth2/success"
+              element={<OAuth2Success />}
             />
 
             {/* ================= ADMIN ================= */}
