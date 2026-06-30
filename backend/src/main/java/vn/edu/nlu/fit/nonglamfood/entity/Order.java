@@ -29,8 +29,6 @@ public class Order {
     @JoinColumn(name = "order_id")
     private List<OrderDetail> items;
 
-    // --- GETTER & SETTER ĐÃ ĐƯỢC SỬA CHUẨN CÚ PHÁP JAVA ---
-
     public Long getId() {
         return id;
     }
@@ -76,6 +74,6 @@ public class Order {
     }
 
     public void setItems(List<OrderDetail> items) {
-        this.items = items; // Đã sửa: gán chuẩn, không return void
+        this.items = items; 
     }
 }

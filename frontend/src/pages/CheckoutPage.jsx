@@ -6,7 +6,7 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const { cart, cartCount, cartTotal, clearCart } = useCart();
 
-  // Quản lý thông tin khách hàng nhập vào form
+  // Quản lý thông tin khách hàng 
   const [shippingInfo, setShippingInfo] = useState({
     fullName: '',
     phone: '',
@@ -45,7 +45,6 @@ const CheckoutPage = () => {
       return;
     }
 
-    // TỰ ĐỘNG 100%: Khách đặt món nào lấy đúng ID món đó
     const formattedItems = cart.map(item => {
       const currentId = item.id || item.productId || item.product_id;
 
@@ -87,7 +86,7 @@ const CheckoutPage = () => {
         throw new Error(result.message || "Lỗi lưu đơn hàng phía Server");
       }
 
-      // Hiện thông báo thành công lên màn hình
+      // Hiện thông báo thành công 
       showNotification(`Chúc mừng ${shippingInfo.fullName} đã đặt hàng thành công!`, "success");
 
       setTimeout(() => {
@@ -177,7 +176,7 @@ const CheckoutPage = () => {
             </div>
           </div>
 
-          {/* Tổng kết số tiền hóa đơn */}
+          {/* Tổng tiền */}
           <div className="border-t pt-4 space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-gray-500">Tổng thanh toán</span>
@@ -186,7 +185,6 @@ const CheckoutPage = () => {
               </span>
             </div>
 
-            {/* Hiển thị thông báo động */}
             {notification.isVisible && (
               <div
                 className={`p-4 rounded-xl border flex items-start gap-3 transition-all duration-300 ${notification.type === 'success'

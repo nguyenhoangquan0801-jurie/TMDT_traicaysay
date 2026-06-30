@@ -20,8 +20,7 @@ import java.util.Map;
 public class OrderController {
 
     @Autowired
-    private JdbcTemplate jdbcTemplate; // Sử dụng bộ điều khiển SQL thuần để bỏ qua hoàn toàn lỗi kẹt của
-                                       // Hibernate/Jackson
+    private JdbcTemplate jdbcTemplate;
 
     @PostMapping
     public ResponseEntity<?> createOrder(@RequestBody Map<String, Object> payload) {
@@ -29,14 +28,14 @@ public class OrderController {
         try {
             System.out.println("====== NHẬN REQUEST ĐẶT HÀNG: " + payload + " ======");
 
-            // 1. Lấy thông tin cơ bản từ payload React gửi lên
+            // Lấy thông tin cơ bản từ payload React gửi lên
             Object userIdObj = payload.get("userId");
             long userId = (userIdObj != null) ? Long.parseLong(userIdObj.toString()) : 1L;
 
             Object totalAmountObj = payload.get("totalAmount");
             double totalAmount = (totalAmountObj != null) ? Double.parseDouble(totalAmountObj.toString()) : 0.0;
 
-            // 2. Chèn dữ liệu vào bảng 'orders' và lấy ID vừa sinh ra
+            // Chèn dữ liệu vào bảng 'orders' và lấy ID 
             String insertOrderSql = "INSERT INTO orders (user_id, total_amount, order_date, status) VALUES (?, ?, NOW(), 0)";
             KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -50,23 +49,20 @@ public class OrderController {
             long orderId = keyHolder.getKey().longValue();
             System.out.println("====== ĐÃ TẠO ĐƠN HÀNG THÀNH CÔNG! ID: " + orderId + " ======");
 
-            // 3. Duyệt mảng 'items' từ giỏ hàng gửi lên để lưu vào bảng 'order_details'
+            // Duyệt mảng 'items' từ giỏ hàng gửi lên để lưu vào bảng 'order_details'
             if (payload.get("items") != null) {
                 List<Map<String, Object>> items = (List<Map<String, Object>>) payload.get("items");
                 String insertDetailSql = "INSERT INTO order_details (order_id, product_id, name, image, quantity, price) VALUES (?, ?, ?, ?, ?, ?)";
 
                 for (Map<String, Object> item : items) {
-                    // Kiểm tra mọi khả năng lấy key ID từ React gửi lên
+                    
                     Object productIdObj = item.get("id") != null ? item.get("id")
                             : (item.get("productId") != null ? item.get("productId") : item.get("product_id"));
 
                     Long productId = null;
                     if (productIdObj != null && !productIdObj.toString().equals("null")) {
                         productId = Long.parseLong(productIdObj.toString());
-                    } else {
-                        // BỌC LÓT PHÒNG HỜ: Nếu Frontend gửi lên bị null, gán tạm sản phẩm ID = 1
-                        // (Hoặc ID bất kỳ đang có sẵn trong bảng 'products' của bạn) để MySQL không báo
-                        // lỗi ngoại
+                    } else {                    
                         productId = 1L;
                     }
 
@@ -80,13 +76,10 @@ public class OrderController {
                     Object priceObj = item.get("price");
                     double price = (priceObj != null) ? Double.parseDouble(priceObj.toString()) : 0.0;
 
-                    // Thực thi lưu vào database
                     jdbcTemplate.update(insertDetailSql, orderId, productId, name, image, quantity, price);
                 }
             }
 
-            // Phản hồi định dạng JSON chuẩn phẳng lỳ, React nhận được sẽ chạy vào nhánh
-            // thành công ngay
             response.put("success", true);
             response.put("id", orderId);
             response.put("message", "Đặt hàng thành công!");
@@ -103,7 +96,7 @@ public class OrderController {
     @SuppressWarnings("deprecation")
     @GetMapping
     public ResponseEntity<?> getAllOrders() {
-        // 1. Lấy toàn bộ danh sách đơn hàng tổng quát
+        // Lấy toàn bộ danh sách đơn hàng
         String sqlOrders = "SELECT id, " +
                 "id AS ma_don_hang, " +
                 "user_id, " +
@@ -116,8 +109,6 @@ public class OrderController {
 
         List<Map<String, Object>> orders = jdbcTemplate.queryForList(sqlOrders);
 
-        // 2. Với mỗi đơn hàng, truy vấn tiếp bảng chi tiết để nạp danh sách sản phẩm (items) vào bên trong
-        // ĐÃ CẬP NHẬT: ÉP KIỂU ĐỐI TƯỢNG TRONG SQL ĐỂ TRANH LỖI BIGDECIMAL SANG REACT KHÔNG NHÂN ĐƯỢC PHÉP TÍNH
         String sqlDetails = "SELECT product_id AS productId, name, image, quantity, (price + 0) AS price FROM order_details WHERE order_id = ?";
 
         for (Map<String, Object> order : orders) {
@@ -126,19 +117,18 @@ public class OrderController {
             // Lấy các sản phẩm thuộc về đơn hàng này
             List<Map<String, Object>> items = jdbcTemplate.queryForList(sqlDetails, orderId);
 
-            // Đút mảng sản phẩm vào đúng key 'items' để React dễ dàng loop (.map) ra giao diện
             order.put("items", items);
         }
 
         return ResponseEntity.ok(orders);
     }
 
-    // API CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG (HỦY ĐƠN HOẶC XÁC NHẬN)
+    // API CẬP NHẬT TRẠNG THÁI ĐƠN HÀNG 
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateOrderStatus(@PathVariable Long id, @RequestBody Map<String, Object> body) {
         Map<String, Object> response = new HashMap<>();
         try {
-            // Lấy status mới từ React gửi lên (Ví dụ: -1 là hủy, 1 là đã xác nhận...)
+            // Lấy status mới từ React gửi lên 
             Object statusObj = body.get("status");
             if (statusObj == null) {
                 response.put("success", false);

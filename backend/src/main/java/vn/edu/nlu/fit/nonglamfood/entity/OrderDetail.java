@@ -21,7 +21,6 @@ public class OrderDetail {
     private Integer quantity;
     private BigDecimal price;
 
-    // --- GETTER & SETTER CHUẨN (KHÔNG LỖI RETURN VOID) ---
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

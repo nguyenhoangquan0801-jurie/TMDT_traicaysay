@@ -21,7 +21,6 @@ const ProductDetail = () => {
         
         setMainImage(foundProduct.images?.[0] || foundProduct.image || '');
 
-        // --- TỰ ĐỘNG CẬP NHẬT LỊCH SỬ XEM SẢN PHẨM ---
         let viewedIds = JSON.parse(localStorage.getItem("viewed_product_ids")) || [];
         // Lọc trùng ID cũ để đưa sản phẩm mới xem lên đầu danh sách
         viewedIds = viewedIds.filter(itemId => String(itemId) !== String(foundProduct.id));
@@ -29,9 +28,9 @@ const ProductDetail = () => {
         // Giới hạn hiển thị tối đa 12 sản phẩm trong lịch sử
         if (viewedIds.length > 12) viewedIds.pop();
         localStorage.setItem("viewed_product_ids", JSON.stringify(viewedIds));
-        // Bắn sự kiện thông báo để trang History cập nhật real-time
+        // Bắn sự kiện thông báo để trang History cập nhật
         window.dispatchEvent(new Event("localHistoryChanged"));
-        // ----------------------------------------------
+        
       }
     }
     setQuantity(1); 
@@ -40,7 +39,7 @@ const ProductDetail = () => {
   const handleIncrease = () => setQuantity((prev) => prev + 1);
   const handleDecrease = () => setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
 
-  // Thêm vào giỏ hàng với đầy đủ thông tin 
+  // Thêm vào giỏ hàng 
   const handleAddToCart = () => {
     if (!product) return;
     addToCart({ ...product, image: mainImage }, quantity); 
@@ -63,7 +62,7 @@ const ProductDetail = () => {
     );
   }
 
-  // Tính phần trăm giảm giá dựa trên giá cũ và giá mới 
+  // Tính phần trăm giảm giá 
   const oldPrice = product.oldPrice || product.price || 0;
   const currentPrice = product.price || 0;
   const discount = oldPrice > currentPrice ? Math.round(((oldPrice - currentPrice) / oldPrice) * 100) : 0;
@@ -73,7 +72,6 @@ const ProductDetail = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       
-      {/* BREADCRUMB  */}
       <div className="border-b border-gray-200 bg-white">
         <div className="max-w-7xl mx-auto px-6 py-5">
           <p className="text-sm text-gray-500">
@@ -83,7 +81,7 @@ const ProductDetail = () => {
         </div>
       </div>
 
-      {/* CHI TIẾT SẢN PHẨM */}
+      // Chi tiết sản phẩm
       <div className="max-w-7xl mx-auto px-6 py-12">
         <div className="grid lg:grid-cols-2 gap-12">
            
@@ -128,7 +126,6 @@ const ProductDetail = () => {
               <p>Mã sản phẩm: <span className="text-gray-700 font-medium">{product.sku || `NLF-${product.id}`}</span></p>
             </div>
 
-            {/* HIỂN THỊ GIÁ CẢ & SỐ TIỀN TIẾT KIỆM */}
             <div className="mt-8 p-6 rounded-[32px] bg-green-50 border border-green-100">
               <div className="flex flex-wrap items-center gap-4">
                 <span className="text-5xl font-bold text-green-600">
@@ -157,7 +154,7 @@ const ProductDetail = () => {
               )}
             </div>
 
-            {/* MÔ TẢ CHI TIẾT */}
+            {/* Mô tả chi tiết */}
             <div className="mt-8">
               <h3 className="text-2xl font-bold text-gray-800">Mô tả sản phẩm</h3>
               <div className="text-gray-600 leading-relaxed mt-4 text-lg space-y-3">
@@ -176,7 +173,6 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* VẬN CHUYỂN */}
             <div className="mt-8 bg-white border border-gray-100 rounded-[28px] p-6 shadow-sm">
               <div className="space-y-4">
                 <div className="flex gap-4">
@@ -196,7 +192,7 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* CÁC MÃ GIẢM GIÁ */}
+            {/* Các mã giảm giá */}
             <div className="mt-8">
               <h3 className="text-2xl font-bold text-gray-800 mb-5">Mã giảm giá</h3>
               <div className="flex flex-wrap gap-4">
@@ -242,7 +238,7 @@ const ProductDetail = () => {
           </div>
         </div>
 
-        {/* SẢN PHẨM LIÊN QUAN */}
+        {/* Các sản phẩm liên quan */}
         <div className="mt-24">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-800 mt-6">Sản phẩm thường mua cùng</h2>
