@@ -8,7 +8,7 @@ const ProductCard = ({ product }) => {
 
   const [isHovered, setIsHovered] = useState(false);
 
-  // Kiểm tra dữ liệu sản phẩm
+  // Kiểm tra dữ liệu sản phẩm đầu vào
   if (!product) {
     return (
       <div className="bg-white border border-red-200 rounded-3xl p-6 shadow-sm">
@@ -19,8 +19,10 @@ const ProductCard = ({ product }) => {
     );
   }
 
+  const rawId = product.id || product.productId;
+  const id = rawId ? Number(rawId) : null;
+
   const {
-    id,
     name = 'Sản phẩm',
     price = 0,
     image,
@@ -29,7 +31,14 @@ const ProductCard = ({ product }) => {
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
-    addToCart(product);
+    console.log("DỮ LIỆU GỐC CỦA SẢN PHẨM TỪ API TRẢ VỀ:", product);
+
+    const exactId = product.id || product.productId || product.product_id;
+
+    addToCart({
+      ...product,
+      id: exactId ? Number(exactId) : null // Đảm bảo luôn có ID gửi vào giỏ hàng
+    });
   };
 
   return (
@@ -96,7 +105,6 @@ const ProductCard = ({ product }) => {
         )}
       </div>
 
-      {/* CONTENT */}
       <div className="p-5 flex flex-col flex-1">
         {/* Product name */}
         <h3

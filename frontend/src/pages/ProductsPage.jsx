@@ -190,7 +190,6 @@ const ProductsPage = () => {
               const hasSale = p.oldPrice && p.oldPrice > p.price;
               const salePercent = hasSale ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : 0;
               
-              // Giả lập số lượng bán dựa trên ID sản phẩm
               const fakeSold = (p.id * 3) % 20 + 5;
               const fakeStock = 30;
               const progressWidth = (fakeSold / fakeStock) * 100;
