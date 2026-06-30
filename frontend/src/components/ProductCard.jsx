@@ -8,7 +8,7 @@ const ProductCard = ({ product }) => {
 
   const [isHovered, setIsHovered] = useState(false);
 
-  // Kiểm tra dữ liệu sản phẩm
+  // Kiểm tra dữ liệu sản phẩm đầu vào
   if (!product) {
     return (
       <div className="bg-white border border-red-200 rounded-3xl p-6 shadow-sm">
@@ -19,8 +19,11 @@ const ProductCard = ({ product }) => {
     );
   }
 
+  // ĐÃ SỬA: Ép kiểu an toàn ID sản phẩm về Number để đồng bộ tuyệt đối với MySQL và tránh lỗi Foreign Key
+  const rawId = product.id || product.productId;
+  const id = rawId ? Number(rawId) : null;
+
   const {
-    id,
     name = 'Sản phẩm',
     price = 0,
     image,
@@ -29,7 +32,15 @@ const ProductCard = ({ product }) => {
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
-    addToCart(product);
+    console.log("DỮ LIỆU GỐC CỦA SẢN PHẨM TỪ API TRẢ VỀ:", product);
+
+    // TỰ ĐỘNG: Tìm xem Backend đang trả về ID ở trường nào (id, productId hay product_id)
+    const exactId = product.id || product.productId || product.product_id;
+
+    addToCart({
+      ...product,
+      id: exactId ? Number(exactId) : null // Đảm bảo luôn có ID số chuẩn gửi vào giỏ hàng
+    });
   };
 
   return (
