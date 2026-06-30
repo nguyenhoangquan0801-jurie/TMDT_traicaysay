@@ -12,7 +12,10 @@ const Cart = () => {
     const [removingId, setRemovingId] = useState(null);
 
     // Total quantity 
-    const totalItems = cart.length;
+    const totalItems = cart.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+);
     
     // Open with animation
     const handleOpenCart = useCallback(() => {
@@ -51,7 +54,7 @@ const Cart = () => {
     }, [isOpen]);
 
     // Animated item removal
-    const handleRemove = async (itemId) => {
+    const handleRemove = (itemId) => {
         setRemovingId(itemId);
         setTimeout(() => {
             removeFromCart(itemId);
