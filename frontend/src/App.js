@@ -1,53 +1,24 @@
 import React from 'react';
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-} from 'react-router-dom';
-
-// =========================
-// CONTEXT
-// =========================
+import { BrowserRouter, Routes, Route, } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { AuthProvider } from './context/AuthContext';
-
-// =========================
-// LAYOUT COMPONENTS
-// =========================
 import Navbar from './components/Navbar';
 import Cart from './components/Cart';
-
-// =========================
-// PUBLIC PAGES
-// =========================
+import ScrollToTop from './components/ScrollToTop';
 import Home from './pages/Home';
 import ProductsPage from './pages/ProductsPage';
 import ProductDetail from './pages/ProductDetail';
 import CheckoutPage from './pages/CheckoutPage';
 import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
-
-// =========================
-// ADMIN PAGES
-// =========================
+import OrderHistory from './components/OrderHistory';
 import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
-
-// =========================
-// SELLER PAGES
-// =========================
 import SellerLayout from './sellerPage/layouts/seller';
 import SellerDashboard from './sellerPage/pages/sellerDash';
 import SellerProducts from './sellerPage/pages/sellerProducts';
-
-// =========================
-// ROUTE PROTECTION
-// =========================
 import PrivateRoute from './routes/PrivateRoute';
 
-// =========================
-// 404 PAGE
-// =========================
 const NotFoundPage = () => {
   return (
     <div
@@ -73,7 +44,7 @@ const NotFoundPage = () => {
           shadow-xl
         "
       >
-        {/* NUMBER */}
+
         <div
           className="
             text-[120px]
@@ -86,12 +57,10 @@ const NotFoundPage = () => {
           404
         </div>
 
-        {/* TITLE */}
         <h1 className="text-4xl font-bold text-gray-800 mt-4">
           Trang không tồn tại
         </h1>
 
-        {/* DESCRIPTION */}
         <p
           className="
             text-gray-500
@@ -106,7 +75,6 @@ const NotFoundPage = () => {
           thay đổi đường dẫn hoặc hiện không khả dụng.
         </p>
 
-        {/* BUTTON */}
         <a
           href="/"
           className="
@@ -133,23 +101,22 @@ const NotFoundPage = () => {
   );
 };
 
-// =========================
-// MAIN APP
-// =========================
 function App() {
   return (
     <AuthProvider>
       <CartProvider>
         <BrowserRouter>
+
+          <ScrollToTop />
+
           <Routes>
-            {/*route của seller*/}
+
             <Route path="/seller" element={<SellerLayout />}>
               <Route index element={<SellerDashboard />} />
               <Route path="dashboard" element={<SellerDashboard />} />
               <Route path="products" element={<SellerProducts />} />
             </Route>
 
-            {/* route còn lại */}
             <Route
               path="*"
               element={
@@ -158,26 +125,16 @@ function App() {
                   <Cart />
                   <main>
                     <Routes>
-                      {/* PUBLIC ROUTES */}
+
                       <Route path="/" element={<Home />} />
                       <Route path="/products" element={<ProductsPage />} />
                       <Route path="/product/:id" element={<ProductDetail />} />
                       <Route path="/checkout" element={<CheckoutPage />} />
+                      <Route path="/history" element={<OrderHistory />} />
                       <Route path="/about" element={<AboutPage />} />
                       <Route path="/contact" element={<ContactPage />} />
-
-                      {/* ADMIN ROUTES */}
                       <Route path="/admin/login" element={<AdminLogin />} />
-                      <Route
-                        path="/admin"
-                        element={
-                          <PrivateRoute>
-                            <AdminDashboard />
-                          </PrivateRoute>
-                        }
-                      />
-
-                      {/* 404 PAGE */}
+                      <Route path="/admin" element={<PrivateRoute> <AdminDashboard /> </PrivateRoute>} />
                       <Route path="*" element={<NotFoundPage />} />
                     </Routes>
                   </main>

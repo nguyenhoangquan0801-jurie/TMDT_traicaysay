@@ -1,476 +1,272 @@
+import { useMemo, useState, useEffect } from 'react'; 
 import HeroBanner from '../components/HeroBanner';
 import ProductCard from '../components/ProductCard';
 import { Link } from 'react-router-dom';
 
-const mockProducts = [
-  {
-    id: 1,
-    name: 'Chuối Sấy Dẻo',
-    price: 45000,
-    oldPrice: 55000,
-    image: 'https://picsum.photos/id/1015/600/600',
-    category: 'Trái cây sấy',
-  },
-  {
-    id: 2,
-    name: 'Mít Sấy Giòn',
-    price: 65000,
-    oldPrice: 85000,
-    image: 'https://picsum.photos/id/102/600/600',
-    category: 'Đặc sản',
-  },
-  {
-    id: 3,
-    name: 'Thanh Long Sấy',
-    price: 52000,
-    oldPrice: 62000,
-    image: 'https://picsum.photos/id/201/600/600',
-    category: 'Hoa quả sấy',
-  },
-  {
-    id: 4,
-    name: 'Khoai Lang Sấy',
-    price: 38000,
-    oldPrice: 48000,
-    image: 'https://picsum.photos/id/292/600/600',
-    category: 'Snack healthy',
-  },
-  {
-    id: 5,
-    name: 'Dừa Sấy',
-    price: 72000,
-    oldPrice: 89000,
-    image: 'https://picsum.photos/id/133/600/600',
-    category: 'Đặc sản',
-  },
-  {
-    id: 6,
-    name: 'Xoài Sấy',
-    price: 59000,
-    oldPrice: 75000,
-    image: 'https://picsum.photos/id/431/600/600',
-    category: 'Trái cây sấy',
-  },
-];
-
-const categories = [
-  {
-    name: 'Trái Cây Sấy',
-    image: 'https://picsum.photos/id/1080/600/600',
-    count: '48 sản phẩm',
-  },
-  {
-    name: 'Đặc Sản Vùng Miền',
-    image: 'https://picsum.photos/id/669/600/600',
-    count: '32 sản phẩm',
-  },
-  {
-    name: 'Hoa Quả Sấy Giòn',
-    image: 'https://picsum.photos/id/870/600/600',
-    count: '25 sản phẩm',
-  },
-  {
-    name: 'Combo Tiết Kiệm',
-    image: 'https://picsum.photos/id/1060/600/600',
-    count: '18 sản phẩm',
-  },
-];
-
-const features = [
-  {
-    number: '01',
-    title: 'Nguồn gốc rõ ràng',
-    description:
-      'Hợp tác trực tiếp với nông dân và trang trại uy tín trên toàn quốc.',
-  },
-  {
-    number: '02',
-    title: 'Công nghệ hiện đại',
-    description:
-      'Ứng dụng công nghệ sấy lạnh giúp giữ trọn hương vị tự nhiên.',
-  },
-  {
-    number: '03',
-    title: 'Giao hàng tận nơi',
-    description:
-      'Đóng gói cẩn thận và giao hàng nhanh chóng trên toàn quốc.',
-  },
-];
+// Import mảng products chuẩn gồm 50 sản phẩm thực tế của bạn
+import { products } from '../data/mockProducts'; 
 
 const Home = () => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // ⏱️ Bộ đếm ngược thời gian thực cho Flash Sale
+  const [countdown, setCountdown] = useState({ hours: 2, minutes: 45, seconds: 12 });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev.hours === 0 && prev.minutes === 0 && prev.seconds === 0) {
+          clearInterval(timer);
+          return prev;
+        }
+        let s = prev.seconds - 1;
+        let m = prev.minutes;
+        let h = prev.hours;
+
+        if (s < 0) { s = 59; m -= 1; }
+        if (m < 0) { m = 59; h -= 1; }
+        return { hours: h, minutes: m, seconds: s };
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const categories = useMemo(() => {
+    // 1. Trái cây sấy dẻo / nguyên vị
+    const fruitList = products.filter(p => 
+      p.name.toLowerCase().includes('dẻo') || 
+      p.name.toLowerCase().includes('khô') || 
+      p.category === 'trai-cay-say'
+    );
+    
+    // 2. Đặc sản vùng miền
+    const specialList = products.filter(p => 
+      ['bắc giang', 'đà lạt', 'tiền giang', 'bến tre', 'đồng tháp', 'huế', 'đặc sản'].some(prov => 
+        p.origin?.toLowerCase().includes(prov) || p.name.toLowerCase().includes(prov) || p.tag?.toLowerCase().includes(prov)
+      )
+    );
+
+    // 3. Hoa quả sấy giòn
+    const crispList = products.filter(p => 
+      p.name.toLowerCase().includes('giòn') || p.tag?.toLowerCase().includes('giòn')
+    );
+
+    return [
+      {
+        name: 'Trái Cây Sấy',
+        image: products.find(p => p.id === 15)?.image || '/assets/dautaysay.png', 
+        filterType: 'trai-cay-say',
+        searchKeyword: '', 
+        count: `${fruitList.length} sản phẩm`,
+      },
+      {
+        name: 'Đặc Sản Vùng Miền',
+        image: products.find(p => p.id === 27)?.image || '/assets/vaithieukho.png', 
+        filterType: 'trai-cay-say', 
+        searchKeyword: 'đặc sản',    
+        count: `${specialList.length} sản phẩm`,
+      },
+      {
+        name: 'Hoa Quả Sấy Giòn',
+        image: products.find(p => p.id === 8)?.image || '/assets/mitsaygion.png', 
+        filterType: 'trai-cay-say', 
+        searchKeyword: 'giòn',       
+        count: `${crispList.length} sản phẩm`,
+      },
+    ];
+  }, []);
+
+  // Lấy danh sách sản phẩm hiển thị trong mục Flash Sale (Tối đa 4 món)
+  const homeFlashSaleProducts = useMemo(() => {
+    return products
+      .filter(p => p.oldPrice && p.oldPrice > p.price)
+      .slice(0, 4);
+  }, []);
+
+  // Thiết lập số lượng sản phẩm hiển thị tại trang chủ
+  const visibleProducts = isExpanded ? products : products.slice(0, 8);
+
   return (
     <div className="bg-gray-50 min-h-screen overflow-hidden">
-      {/* HERO */}
+      {/* HERO BANNER */}
       <HeroBanner />
 
-      {/* CATEGORIES */}
-      <section className="py-20 bg-white">
+      {/* 1. CATEGORIES SECTION */}
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6">
-          {/* HEADER */}
-          <div className="text-center mb-14">
-            <span
-              className="
-                inline-block
-                px-5
-                py-2
-                rounded-full
-                bg-green-100
-                text-green-700
-                text-sm
-                font-semibold
-              "
-            >
-              DANH MỤC
-            </span>
-
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mt-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-950 mb-4">
               Danh Mục Sản Phẩm
             </h2>
-
-            <p className="text-gray-500 mt-5 max-w-2xl mx-auto text-lg leading-relaxed">
-              Khám phá các dòng sản phẩm trái cây sấy và đặc sản
-              chất lượng cao tại Nông Lâm Store.
+            <p className="text-gray-500 max-w-2xl mx-auto text-base md:text-lg leading-relaxed">
+              Khám phá các dòng sản phẩm trái cây sấy và đặc sản chất lượng cao tại Nông Lâm Store.
             </p>
           </div>
 
-          {/* GRID */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
             {categories.map((cat, index) => (
-              <div
+              <Link
                 key={index}
-                className="
-                  group
-                  bg-white
-                  rounded-[32px]
-                  overflow-hidden
-                  border
-                  border-gray-100
-                  shadow-sm
-                  hover:shadow-2xl
-                  transition-all
-                  duration-500
-                  cursor-pointer
-                  hover:-translate-y-2
-                "
+                to="/products"
+                state={{ 
+                  categoryFilter: cat.filterType,
+                  searchKeyword: cat.searchKeyword 
+                }}
+                className="group flex flex-col items-center bg-white transition-all duration-300 w-full max-w-[220px]"
               >
-                {/* IMAGE */}
-                <div className="overflow-hidden h-72">
+                <div className="w-full aspect-square rounded-[24px] overflow-hidden shadow-sm border border-gray-100 bg-gray-50">
                   <img
                     src={cat.image}
                     alt={cat.name}
-                    className="
-                      w-full
-                      h-full
-                      object-cover
-                      group-hover:scale-110
-                      transition-transform
-                      duration-700
-                    "
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 object-center"
+                    onError={(e) => {
+                      e.target.src = "https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?w=500";
+                    }}
                   />
                 </div>
 
-                {/* CONTENT */}
-                <div className="p-7 text-center">
-                  <h3 className="text-2xl font-bold text-gray-800">
+                <div className="pt-4 text-center px-2">
+                  <h3 className="text-lg md:text-xl font-bold text-gray-900 group-hover:text-green-600 transition-colors tracking-tight">
                     {cat.name}
                   </h3>
-
-                  <p className="text-green-600 font-medium mt-3">
+                  <p className="text-xs font-semibold text-green-600 mt-1">
                     {cat.count}
                   </p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* BEST SELLER */}
-      <section className="py-20">
+      {/* 2. SECTION TẤT CẢ SẢN PHẨM */}
+      <section className="py-20 bg-gray-50 border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-6">
-          {/* HEADER */}
-          <div
-            className="
-              flex
-              flex-col
-              lg:flex-row
-              lg:items-end
-              lg:justify-between
-              gap-6
-              mb-14
-            "
-          >
+          <div className="text-center mb-14">
+            <span className="inline-block px-5 py-2 rounded-full bg-green-100 text-green-700 text-sm font-semibold">
+              CỬA HÀNG
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mt-6">
+              Tất Cả Sản Phẩm
+            </h2>
+            <p className="text-gray-500 mt-4 text-lg">
+              Trải nghiệm trọn bộ danh sách sản phẩm sạch và thơm ngon từ hệ thống
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {visibleProducts.map((product) => (
+              <ProductCard 
+                key={product.id} 
+                product={product} 
+              />
+            ))}
+          </div>
+
+          <div className="flex justify-center mt-12">
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="inline-flex items-center justify-center px-8 py-4 rounded-2xl bg-green-600 text-white font-semibold hover:bg-green-700 transition-all duration-300 shadow-md hover:shadow-lg cursor-pointer"
+            >
+              {isExpanded ? 'Thu gọn sản phẩm' : 'Xem tất cả sản phẩm'}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 3. BEST SELLER */}
+      <section className="py-20 bg-white border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
             <div>
-              <span
-                className="
-                  inline-block
-                  px-5
-                  py-2
-                  rounded-full
-                  bg-green-100
-                  text-green-700
-                  text-sm
-                  font-semibold
-                "
-              >
+              <span className="inline-block px-5 py-2 rounded-full bg-green-100 text-green-700 text-sm font-semibold">
                 BEST SELLER
               </span>
-
               <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mt-6">
                 Sản Phẩm Bán Chạy
               </h2>
-
               <p className="text-gray-500 mt-4 text-lg">
                 Được khách hàng yêu thích và lựa chọn nhiều nhất
               </p>
             </div>
-
             <Link
               to="/products"
-              className="
-                inline-flex
-                items-center
-                justify-center
-                px-7
-                py-4
-                rounded-2xl
-                bg-white
-                border
-                border-gray-200
-                hover:border-green-500
-                hover:text-green-600
-                font-semibold
-                transition-all
-                duration-300
-                shadow-sm
-                hover:shadow-lg
-              "
+              className="inline-flex items-center justify-center px-7 py-4 rounded-2xl bg-white border border-gray-200 hover:border-green-500 hover:text-green-600 font-semibold transition-all duration-300 shadow-sm hover:shadow-lg"
             >
               Xem tất cả sản phẩm
             </Link>
           </div>
 
-          {/* PRODUCTS */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {mockProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-              />
+            {products.slice(0, 4).map((product) => (
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* FEATURES */}
-      <section className="py-24 bg-white">
+      {/* 4. SECTION FLASH SALE GIỜ VÀNG */}
+      <section className="py-20 bg-gradient-to-b from-red-50 to-orange-50 border-t border-b border-red-100/60">
         <div className="max-w-7xl mx-auto px-6">
-          {/* HEADER */}
-          <div className="text-center mb-16">
-            <span
-              className="
-                inline-block
-                px-5
-                py-2
-                rounded-full
-                bg-green-100
-                text-green-700
-                text-sm
-                font-semibold
-              "
-            >
-              GIÁ TRỊ
-            </span>
-
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mt-6">
-              Tại Sao Chọn Chúng Tôi?
-            </h2>
-
-            <p className="text-gray-500 mt-5 max-w-3xl mx-auto text-lg leading-relaxed">
-              Chúng tôi cam kết mang đến những sản phẩm sạch,
-              chất lượng và tốt cho sức khỏe người tiêu dùng.
-            </p>
-          </div>
-
-          {/* GRID */}
-          <div className="grid md:grid-cols-3 gap-8">
-            {features.map((item, index) => (
-              <div
-                key={index}
-                className="
-                  bg-gray-50
-                  border
-                  border-gray-100
-                  rounded-[32px]
-                  p-10
-                  hover:bg-white
-                  hover:shadow-2xl
-                  transition-all
-                  duration-500
-                  hover:-translate-y-2
-                "
-              >
-                <div
-                  className="
-                    w-20
-                    h-20
-                    rounded-3xl
-                    bg-green-100
-                    flex
-                    items-center
-                    justify-center
-                    text-2xl
-                    font-bold
-                    text-green-700
-                  "
-                >
-                  {item.number}
-                </div>
-
-                <h3 className="text-2xl font-bold text-gray-800 mt-8">
-                  {item.title}
-                </h3>
-
-                <p className="text-gray-500 mt-5 leading-relaxed text-lg">
-                  {item.description}
-                </p>
+          {/* HEADER FLASH SALE */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 bg-white p-6 rounded-3xl border border-red-100 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-black text-red-600 uppercase tracking-tight">Flash Sale Giờ Vàng</h2>
+                {/* <p className="text-xs text-gray-500 mt-0.5">Ưu đãi giới hạn, làm mới sau mỗi khung giờ!</p> */}
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FLASH SALE */}
-      <section className="py-20 bg-red-50">
-        <div className="max-w-7xl mx-auto px-6">
-          {/* TOP */}
-          <div
-            className="
-              flex
-              flex-col
-              lg:flex-row
-              lg:items-center
-              lg:justify-between
-              gap-5
-              mb-14
-            "
-          >
-            <div>
-              <span
-                className="
-                  inline-block
-                  px-5
-                  py-2
-                  rounded-full
-                  bg-red-100
-                  text-red-600
-                  text-sm
-                  font-semibold
-                "
-              >
-                FLASH SALE
-              </span>
-
-              <h2 className="text-4xl md:text-5xl font-bold text-red-600 mt-6">
-                Giá Sốc Hôm Nay
-              </h2>
             </div>
-
-            <div
-              className="
-                px-6
-                py-4
-                rounded-2xl
-                bg-white
-                border
-                border-red-100
-                shadow-sm
-              "
-            >
-              <p className="text-red-500 font-semibold">
-                Kết thúc sau: 23 giờ 45 phút
-              </p>
+            
+            {/* Countdown timer */}
+            <div className="flex items-center gap-2 font-bold text-lg text-white">
+              <span className="text-xs font-bold text-red-700 uppercase tracking-wider mr-1">Kết thúc sau:</span>
+              <span className="bg-red-600 px-3 py-1.5 rounded-xl shadow-sm">{String(countdown.hours).padStart(2, '0')}</span>
+              <span className="text-red-600">:</span>
+              <span className="bg-red-600 px-3 py-1.5 rounded-xl shadow-sm">{String(countdown.minutes).padStart(2, '0')}</span>
+              <span className="text-red-600">:</span>
+              <span className="bg-red-600 px-3 py-1.5 rounded-xl shadow-sm">{String(countdown.seconds).padStart(2, '0')}</span>
             </div>
           </div>
 
-          {/* PRODUCTS */}
+          {/* DANH SÁCH CARD SẢN PHẨM FLASH SALE */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {mockProducts.slice(0, 4).map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
+            {homeFlashSaleProducts.map((product) => {
+              const salePercent = Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100);
 
-      {/* CTA */}
-      <section className="py-24">
-        <div className="max-w-6xl mx-auto px-6">
-          <div
-            className="
-              rounded-[40px]
-              bg-green-600
-              px-10
-              py-20
-              text-center
-              text-white
-              shadow-2xl
-            "
-          >
-            <h2 className="text-4xl md:text-5xl font-bold leading-tight">
-              Thực phẩm sạch cho
-              <span className="block mt-3">
-                cuộc sống khỏe mạnh
-              </span>
-            </h2>
+              return (
+                <div key={product.id} className="bg-white rounded-[32px] border border-red-50 p-4 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-300 relative group">
+                  <div>
+                    {/* Ảnh & Nhãn % giảm giá */}
+                    <div className="w-full aspect-square bg-gray-50 rounded-2xl overflow-hidden mb-4 relative">
+                      <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-300" />
+                      <span className="absolute top-3 right-3 bg-red-600 text-white font-black text-[11px] px-2.5 py-1 rounded-full shadow-md">
+                        -{salePercent}% OFF
+                      </span>
+                    </div>
 
-            <p className="max-w-3xl mx-auto text-green-100 mt-7 text-lg leading-relaxed">
-              Nông Lâm Store mang đến những sản phẩm trái cây
-              sấy tự nhiên, an toàn và giàu dinh dưỡng dành cho
-              mọi gia đình Việt.
-            </p>
+                    <h3 className="font-bold text-gray-900 text-base line-clamp-2 min-h-[3rem] group-hover:text-red-600 transition-colors">
+                      {product.name}
+                    </h3>
+                  </div>
 
-            <div className="flex flex-col sm:flex-row gap-5 justify-center mt-10">
-              <Link
-                to="/products"
-                className="
-                  px-8
-                  py-4
-                  rounded-2xl
-                  bg-white
-                  text-green-700
-                  font-semibold
-                  hover:bg-green-50
-                  transition-all
-                  duration-300
-                  shadow-lg
-                "
-              >
-                Khám phá sản phẩm
-              </Link>
+                  <div className="mt-4">
+                    {/* Giá tiền */}
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-xl font-black text-red-600">
+                        {product.price.toLocaleString('vi-VN')}đ
+                      </span>
+                      <span className="text-xs text-gray-400 line-through">
+                        {product.oldPrice.toLocaleString('vi-VN')}đ
+                      </span>
+                    </div>
 
-              <Link
-                to="/contact"
-                className="
-                  px-8
-                  py-4
-                  rounded-2xl
-                  border
-                  border-white/30
-                  bg-white/10
-                  backdrop-blur
-                  text-white
-                  font-semibold
-                  hover:bg-white/20
-                  transition-all
-                  duration-300
-                "
-              >
-                Liên hệ với chúng tôi
-              </Link>
-            </div>
+                    <button className="w-full mt-5 py-3 rounded-xl bg-gradient-to-r from-red-600 to-orange-500 text-white font-bold text-xs hover:opacity-90 transition-opacity shadow-sm">
+                      Hốt Ngay Deal Sốc
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -479,38 +275,23 @@ const Home = () => {
       <footer className="bg-gray-900 text-white pt-20 pb-10">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-10 pb-14 border-b border-gray-800">
-            {/* BRAND */}
             <div className="md:col-span-2">
-              <h2 className="text-4xl font-bold text-white">
-                nonglamfood
-              </h2>
-
+              <h2 className="text-4xl font-bold text-white">NongLamFood</h2>
               <p className="text-gray-400 mt-5 leading-relaxed max-w-lg">
-                Chuyên cung cấp trái cây sấy, đặc sản vùng miền
-                và thực phẩm sạch chất lượng cao tại Việt Nam.
+                Chuyên cung cấp trái cây sấy, đặc sản vùng miền và thực phẩm sạch chất lượng cao tại Việt Nam.
               </p>
             </div>
-
-            {/* LINKS */}
             <div>
-              <h3 className="text-xl font-semibold mb-5">
-                Điều hướng
-              </h3>
-
+              <h3 className="text-xl font-semibold mb-5">Điều hướng</h3>
               <div className="space-y-3 text-gray-400">
-                <p>Trang chủ</p>
-                <p>Sản phẩm</p>
+                <Link to="/" className="block hover:text-white transition-colors">Trang chủ</Link>
+                <Link to="/products" className="block hover:text-white transition-colors">Sản phẩm</Link>
                 <p>Giới thiệu</p>
                 <p>Liên hệ</p>
               </div>
             </div>
-
-            {/* CONTACT */}
             <div>
-              <h3 className="text-xl font-semibold mb-5">
-                Thông tin
-              </h3>
-
+              <h3 className="text-xl font-semibold mb-5">Thông tin</h3>
               <div className="space-y-3 text-gray-400">
                 <p>TP. Hồ Chí Minh</p>
                 <p>support@nonglamfood.vn</p>
@@ -518,8 +299,6 @@ const Home = () => {
               </div>
             </div>
           </div>
-
-          {/* COPYRIGHT */}
           <div className="pt-8 text-center text-gray-500">
             © 2026 Nông Lâm Store. All rights reserved.
           </div>
