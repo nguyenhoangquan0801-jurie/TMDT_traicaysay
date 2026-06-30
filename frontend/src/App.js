@@ -218,7 +218,7 @@ function App() {
             <Route
               path="/admin"
               element={
-                <PrivateRoute>
+                <PrivateRoute roles={["ADMIN"]}>
                   <AdminDashboard />
                 </PrivateRoute>
               }
@@ -228,8 +228,12 @@ function App() {
 
             <Route
               path="/seller"
-              element={<SellerLayout />}
-            >
+              element={
+                <PrivateRoute roles={["SELLER"]}>
+                  <SellerLayout />
+                </PrivateRoute>
+              }
+              >
               <Route
                 index
                 element={<SellerDashboard />}

@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ShoppingCart, User, Search, Menu, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useAuth } from "../context/AuthContext";
 
 const NAV_LINKS = [
   { path: '/', label: 'Trang chủ' },
@@ -16,6 +17,7 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const { cartCount } = useCart();
+  const {user,logout,isAdmin,isSeller,} = useAuth();
   const location = useLocation();
 
   const openCart = useCallback(() => {
@@ -102,18 +104,50 @@ const Navbar = () => {
 
           {/* Right Side Actions */}
           <div className="flex items-center gap-4">
-            <Link
-              to="/login"
-              className="flex items-center gap-2 hover:text-emerald-600 transition-colors p-2"
-              aria-label="Tài khoản"
-            >
-              <div className="flex items-center gap-2">
-                  <User size={22} />
-                  <span className="hidden lg:block text-sm">
-                    Đăng nhập
-                  </span>
-          </div>
-            </Link>
+            {!user ? (
+              <Link
+                to="/login"
+                className="flex items-center gap-2 hover:text-emerald-600 transition-colors p-2"
+                >
+                <User size={22} />
+                <span className="hidden lg:block text-sm">
+                  Đăng nhập
+                </span>
+              </Link>
+            ) : (
+              <div className="flex items-center gap-3">
+
+                <span className="hidden lg:block text-sm font-medium">
+                    Xin chào, {user.fullName}
+                </span>
+
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    Admin
+                  </Link>
+                )}
+
+                {isSeller && (
+                  <Link
+                to="/seller"
+                className="text-sm text-green-600 hover:underline"
+                >
+                Seller
+                </Link>
+                )}
+
+                <button
+                  onClick={logout}
+                  className="text-sm text-red-600 hover:underline"
+                >
+                  Đăng xuất
+                </button>
+
+              </div>
+            )}
 
             <button
               type="button"

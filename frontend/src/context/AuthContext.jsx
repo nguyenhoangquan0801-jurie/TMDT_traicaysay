@@ -164,11 +164,6 @@ export const AuthProvider = ({ children }) => {
   const isSeller = user?.role === "SELLER";
 
   const isCustomer = user?.role === "CUSTOMER";
-  const loginGoogle = () => {
-    window.location.href =
-        "http://localhost:8080/oauth2/authorization/google";
-  };
-
 
   const value = useMemo(
     () => ({
