@@ -15,8 +15,10 @@ import {
 } from 'lucide-react';
 import AddProductForm from './AddProductForm';
 
-const SellerProducts = () => {
+import { useAuth } from '../../context/AuthContext';
 
+const SellerProducts = () => {
+    const { user } = useAuth();
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isError, setIsError] = useState(false);
@@ -26,7 +28,7 @@ const SellerProducts = () => {
     const handleAddProduct = (newProduct) => {
         if (editingProduct) {
             const numericId = editingProduct.id.toString().replace('PROD-', '');
-            fetch(`http://localhost:8080/api/seller/products/${numericId}`, {
+            fetch(`http://localhost:8080/api/seller/products/${numericId}?username=${user.username}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newProduct)
@@ -45,7 +47,7 @@ const SellerProducts = () => {
                 alert('Không thể cập nhật sản phẩm. Vui lòng thử lại.');
             });
         } else {
-            fetch('http://localhost:8080/api/seller/products', {
+            fetch(`http://localhost:8080/api/seller/products?username=${user.username}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newProduct)
@@ -76,21 +78,23 @@ const SellerProducts = () => {
     };
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/seller/products')
-            .then(res => {
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                return res.json();
-            })
-            .then(data => {
-                setProducts(data);
-                setIsLoading(false);
-            })
-            .catch(err => {
-                console.error('Error fetching products:', err);
-                setIsError(true);
-                setIsLoading(false);
-            });
-    }, []);
+        if (user?.username) {
+            fetch(`http://localhost:8080/api/seller/products?username=${user.username}`)
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
+                })
+                .then(data => {
+                    setProducts(data);
+                    setIsLoading(false);
+                })
+                .catch(err => {
+                    console.error('Error fetching products:', err);
+                    setIsError(true);
+                    setIsLoading(false);
+                });
+        }
+    }, [user]);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');

@@ -39,6 +39,8 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import SellerLayout from './sellerPage/layouts/seller';
 import SellerDashboard from './sellerPage/pages/sellerDash';
 import SellerProducts from './sellerPage/pages/sellerProducts';
+import SellerSettings from './sellerPage/pages/sellerSettings';
+import SellerOrder from './sellerPage/pages/sellerOrder';
 
 // =========================
 // ROUTE PROTECTION
@@ -143,10 +145,19 @@ function App() {
         <BrowserRouter>
           <Routes>
             {/*route của seller*/}
-            <Route path="/seller" element={<SellerLayout />}>
+            <Route
+              path="/seller"
+              element={
+                <PrivateRoute allowedRoles={[2]}>
+                  <SellerLayout />
+                </PrivateRoute>
+              }
+            >
               <Route index element={<SellerDashboard />} />
               <Route path="dashboard" element={<SellerDashboard />} />
               <Route path="products" element={<SellerProducts />} />
+              <Route path="orders" element={<SellerOrder />} />
+              <Route path="settings" element={<SellerSettings />} />
             </Route>
 
             {/* route còn lại */}
@@ -171,7 +182,7 @@ function App() {
                       <Route
                         path="/admin"
                         element={
-                          <PrivateRoute>
+                          <PrivateRoute allowedRoles={[3]}>
                             <AdminDashboard />
                           </PrivateRoute>
                         }

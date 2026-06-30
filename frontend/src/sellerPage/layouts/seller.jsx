@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, Link, NavLink } from 'react-router-dom';
+import { Outlet, Link, NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Package,
@@ -7,34 +7,40 @@ import {
   MessageSquare,
   Settings,
   Bell,
-  User
+  User,
+  LogOut
 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 const SellerLayout = () => {
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
   const [shopInfo, setShopInfo] = useState({
     shopName: 'Đang tải...',
-    username: 'Loading...',
+    username: user?.username || 'Loading...',
     role: 'Kênh Người Bán',
     notifications: 0
   });
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/seller/info')
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch seller info');
-        return res.json();
-      })
-      .then(data => setShopInfo(data))
-      .catch(err => {
-        console.error('Error fetching seller info, using mock values:', err);
-        setShopInfo({
-          shopName: 'NongLam Food (Mock)',
-          username: 'nonglam_seller',
-          role: 'Shop Đối Tác',
-          notifications: 3
+    if (user?.username) {
+      fetch(`http://localhost:8080/api/seller/info?username=${user.username}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Failed to fetch seller info');
+          return res.json();
+        })
+        .then(data => setShopInfo(data))
+        .catch(err => {
+          console.error('Error fetching seller info, using mock values:', err);
+          setShopInfo({
+            shopName: 'NongLam Food (Mock)',
+            username: user.username,
+            role: 'Shop Đối Tác',
+            notifications: 3
+          });
         });
-      });
-  }, []);
+    }
+  }, [user]);
 
   return (
     <div className="flex flex-col h-screen bg-slate-50 font-sans text-slate-800">
@@ -149,6 +155,17 @@ const SellerLayout = () => {
               <Settings className="w-4 h-4" />
               Cài đặt shop
             </NavLink>
+
+            <button
+              onClick={() => {
+                logout();
+                navigate('/admin/login');
+              }}
+              className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium rounded-lg text-rose-600 hover:bg-rose-50 transition-all mt-4 border-t border-slate-100 pt-6"
+            >
+              <LogOut className="w-4 h-4" />
+              Đăng xuất
+            </button>
           </nav>
         </aside>
 
