@@ -1,36 +1,18 @@
-package vn.edu.nlu.fit.nonglamfood.config; // Nhớ đổi đúng package của bạn nhé
+package vn.edu.nlu.fit.nonglamfood.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
-
-import java.util.Arrays;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class WebConfig {
+public class WebConfig implements WebMvcConfigurer {
 
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        
-        // 1. Cho phép thông tin xác thực (cookies, headers, etc.)
-        config.setAllowCredentials(true);
-        
-        // 2. Cho phép chính xác nguồn từ React Front-end
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
-        
-        // 3. Cho phép tất cả các Headers gửi lên
-        config.setAllowedHeaders(Arrays.asList("*"));
-        
-        // 4. Cho phép các phương thức, đặc biệt bao gồm OPTIONS để fix lỗi preflight
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        
-        // 5. Áp dụng cấu hình này cho mọi API đường dẫn bắt đầu bằng /**
-        source.registerCorsConfiguration("/**", config);
-        
-        return new CorsFilter(source);
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:3000")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }
