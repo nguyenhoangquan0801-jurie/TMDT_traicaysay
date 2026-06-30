@@ -15,6 +15,7 @@ import ProductDetail from "./pages/ProductDetail";
 import CheckoutPage from "./pages/CheckoutPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
+import Profile from "./pages/Profile";
 
 import Auth from "./pages/Auth/Auth";
 import OAuth2Success from "./pages/OAuth2Success";
@@ -195,6 +196,17 @@ function App() {
                 element={<SellerProducts />}
               />
             </Route>
+
+            <Route
+              path="/profile"
+              element={
+                <CustomerRoute>
+                  <ClientLayout>
+                    <Profile />
+                  </ClientLayout>
+                </CustomerRoute>
+              }
+              />
 
             {/* ================= 404 ================= */}
 

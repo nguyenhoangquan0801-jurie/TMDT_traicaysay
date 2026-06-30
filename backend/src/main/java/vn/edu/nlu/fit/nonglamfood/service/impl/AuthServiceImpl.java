@@ -65,24 +65,36 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
     @Override
-    public LoginResponse login(LoginRequest request) {
+public LoginResponse login(LoginRequest request) {
 
-        User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Email hoặc mật khẩu không đúng."));
+    System.out.println("===== LOGIN SERVICE =====");
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
-            throw new RuntimeException("Email hoặc mật khẩu không đúng.");
-        }
+    User user = userRepository.findByEmail(request.getEmail())
+            .orElseThrow(() -> {
+                System.out.println("KHÔNG TÌM THẤY USER");
+                return new RuntimeException("Email hoặc mật khẩu không đúng.");
+            });
 
-        String token = jwtUtil.generateToken(user.getEmail());
+    System.out.println("USER = " + user.getEmail());
 
-        return LoginResponse.builder()
-                .token(token)
-                .role(user.getRole().getRoleName())
-                .fullName(user.getFullName())
-                .email(user.getEmail())
-                .build();
+    if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+        System.out.println("SAI PASSWORD");
+        throw new RuntimeException("Sai mật khẩu");
     }
+
+    System.out.println("PASSWORD OK");
+
+    String token = jwtUtil.generateToken(user.getEmail());
+
+    System.out.println("TOKEN GENERATED");
+
+    return LoginResponse.builder()
+            .token(token)
+            .role(user.getRole().getRoleName())
+            .fullName(user.getFullName())
+            .email(user.getEmail())
+            .build();
+}
     @Override
     public void forgotPassword(String email) {
 
@@ -128,4 +140,60 @@ public class AuthServiceImpl implements AuthService {
                 .role(user.getRole().getRoleName())
                 .build();
     }
+    @Override
+public UserResponse getProfile(String email) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    return UserResponse.builder()
+            .userId(user.getUserId())
+            .fullName(user.getFullName())
+            .email(user.getEmail())
+            .phone(user.getPhone())
+            .avatar(user.getAvatar())
+            .role(user.getRole().getRoleName())
+            .build();
+}
+    @Override
+public UserResponse updateProfile(String email,
+                                UpdateProfileRequest request) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    user.setFullName(request.getFullName());
+    user.setPhone(request.getPhone());
+
+    userRepository.save(user);
+
+    return UserResponse.builder()
+            .userId(user.getUserId())
+            .fullName(user.getFullName())
+            .email(user.getEmail())
+            .phone(user.getPhone())
+            .avatar(user.getAvatar())
+            .role(user.getRole().getRoleName())
+            .build();
+}
+@Override
+public void changePassword(String email,
+                        ChangePasswordRequest request) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    if (!passwordEncoder.matches(
+            request.getOldPassword(),
+            user.getPasswordHash())) {
+
+        throw new RuntimeException("Mật khẩu cũ không đúng.");
+    }
+
+    user.setPasswordHash(
+            passwordEncoder.encode(request.getNewPassword())
+    );
+
+    userRepository.save(user);
+}
 }

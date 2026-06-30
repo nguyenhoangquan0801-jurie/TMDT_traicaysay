@@ -131,7 +131,7 @@ const Navbar = () => {
         </span>
       </button>
 
-      <div className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl border hidden group-hover:block overflow-hidden z-50">
+      <div className="absolute right-0 mt-0 w-56 bg-white rounded-xl shadow-xl border hidden group-hover:block overflow-hidden z-50">
 
         <div className="px-4 py-3 border-b">
           <div className="font-semibold">
