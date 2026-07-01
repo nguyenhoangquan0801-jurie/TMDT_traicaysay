@@ -1,9 +1,12 @@
 package vn.edu.nlu.fit.nonglamfood.repository;
 
+import vn.edu.nlu.fit.nonglamfood.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-import vn.edu.nlu.fit.nonglamfood.model.Role;
 
-@Repository
-public interface RoleRepository extends JpaRepository<Role, Long> {
+import java.util.Optional;
+
+public interface RoleRepository extends JpaRepository<Role,Integer> {
+
+    Optional<Role> findByRoleName(String roleName);
+
 }

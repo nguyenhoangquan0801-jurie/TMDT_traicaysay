@@ -1,119 +1,308 @@
 import {
-  createContext,
-  useState,
-  useContext,
-  useEffect,
-  useMemo,
-} from 'react';
+    createContext,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 
-const AuthContext = createContext(null);
+import axios from "axios";
+
+const AuthContext = createContext();
+
+const API = "http://localhost:8080/api/auth";
+
+// ==========================
+// Axios
+// ==========================
+
+axios.defaults.baseURL = "http://localhost:8080";
 
 export const AuthProvider = ({ children }) => {
-  // State user
-  const [user, setUser] = useState(null);
 
-  // State loading để tránh render sai khi reload
-  const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);
 
-  // Load user từ localStorage khi khởi động app
-  useEffect(() => {
+    const [loading, setLoading] = useState(true);
+
+    // ==========================
+    // LOAD USER
+    // ==========================
+
+    useEffect(() => {
+
+        const savedUser = localStorage.getItem("user");
+
+        const token = localStorage.getItem("accessToken");
+
+        if (savedUser) {
+            setUser(JSON.parse(savedUser));
+        }
+
+        if (token) {
+            axios.defaults.headers.common[
+                "Authorization"
+            ] = `Bearer ${token}`;
+        }
+
+        setLoading(false);
+
+    }, []);
+
+    
+
+    // ==========================
+    // LOGIN
+    // ==========================
+
+    const login = async (data) => {
+
     try {
-      const savedUser = localStorage.getItem('adminUser');
 
-      if (savedUser) {
-        setUser(JSON.parse(savedUser));
-      }
-    } catch (error) {
-      console.error('Lỗi đọc dữ liệu user:', error);
-      localStorage.removeItem('adminUser');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+        const res = await axios.post(`${API}/login`, {
+            email: data.email,
+            password: data.password,
+        });
 
-  // Hàm đăng nhập
-  const login = async (username, password) => {
-    try {
-      // Giả lập delay API
-      await new Promise((resolve) => setTimeout(resolve, 500));
+        const token = res.data.token;
 
-      // Demo tài khoản admin
-      if (username === 'admin' && password === 'admin123') {
-        const adminData = {
-          id: 1,
-          username: 'admin',
-          role: 'admin',
-          name: 'Quản Trị Viên',
+        const loginUser = {
+            fullName: res.data.fullName,
+            email: res.data.email,
+            role: res.data.role,
         };
 
-        setUser(adminData);
+        axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 
-        localStorage.setItem(
-          'adminUser',
-          JSON.stringify(adminData)
-        );
+        localStorage.setItem("accessToken", token);
+        localStorage.setItem("user", JSON.stringify(loginUser));
+
+        setUser(loginUser);
 
         return {
-          success: true,
-          message: 'Đăng nhập thành công',
+            success: true,
+            data: loginUser,
         };
-      }
 
-      return {
-        success: false,
-        message: 'Sai tài khoản hoặc mật khẩu',
-      };
-    } catch (error) {
-      console.error('Lỗi đăng nhập:', error);
+    } catch (err) {
 
-      return {
-        success: false,
-        message: 'Có lỗi xảy ra khi đăng nhập',
-      };
+        return {
+            success: false,
+            message:
+                err.response?.data?.message ||
+                "Đăng nhập thất bại",
+        };
+
     }
-  };
 
-  // Hàm đăng xuất
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('adminUser');
-  };
-
-  // Kiểm tra đã đăng nhập chưa
-  const isAuthenticated = !!user;
-
-  // Kiểm tra quyền admin
-  const isAdmin = user?.role === 'admin';
-
-  // Memo để tối ưu re-render
-  const value = useMemo(
-    () => ({
-      user,
-      loading,
-      login,
-      logout,
-      isAuthenticated,
-      isAdmin,
-    }),
-    [user, loading]
-  );
-
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
 };
 
-// Custom hook
-export const useAuth = () => {
-  const context = useContext(AuthContext);
+    // ==========================
+    // REGISTER
+    // ==========================
 
-  if (!context) {
-    throw new Error(
-      'useAuth phải được sử dụng bên trong AuthProvider'
+    const register = async (data) => {
+
+        try {
+
+            const res = await axios.post(`${API}/register`, {
+                fullName: data.fullName,
+                email: data.email,
+                phone: data.phone,
+                password: data.password,
+            });
+
+            return {
+                success: true,
+                data: res.data,
+            };
+
+        } catch (err) {
+
+            return {
+                success: false,
+                message:
+                    err.response?.data?.message ||
+                    "Đăng ký thất bại",
+            };
+
+        }
+
+    };
+
+    // ==========================
+    // GOOGLE
+    // ==========================
+
+    const loginGoogle = () => {
+        window.location.href =
+            "http://localhost:8080/oauth2/authorization/google";
+    };
+
+    // ==========================
+    // FACEBOOK
+    // ==========================
+
+    const loginFacebook = () => {
+        alert("Facebook Login đang phát triển.");
+    };
+
+    // ==========================
+    // PROFILE
+    // ==========================
+
+    const getProfile = async () => {
+
+        try {
+
+            const token =
+                localStorage.getItem("accessToken");
+
+            if (!token) return null;
+
+            setLoading(true);
+
+            const res = await axios.get(
+                `${API}/profile`
+            );
+
+            setUser(res.data);
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(res.data)
+            );
+
+            return res.data;
+
+        } catch (err) {
+
+            console.error(err);
+
+            logout();
+
+            return null;
+
+        } finally {
+
+            setLoading(false);
+
+        }
+
+    };
+
+    const updateProfile = async (data) => {
+
+    const token = localStorage.getItem("accessToken");
+
+    const res = await axios.put(
+        "http://localhost:8080/api/auth/profile",
+        data,
+        {
+            headers:{
+                Authorization:`Bearer ${token}`
+            }
+        }
     );
-  }
 
-  return context;
+    setUser(res.data);
+
+    localStorage.setItem(
+        "user",
+        JSON.stringify(res.data)
+    );
+
+    return res.data;
 };
+
+const changePassword = async (data)=>{
+
+    const token = localStorage.getItem("accessToken");
+
+    await axios.put(
+        "http://localhost:8080/api/auth/change-password",
+        data,
+        {
+            headers:{
+                Authorization:`Bearer ${token}`
+            }
+        }
+    );
+
+};
+
+    // ==========================
+    // LOGOUT
+    // ==========================
+
+    const logout = () => {
+
+        setUser(null);
+
+        delete axios.defaults.headers.common[
+            "Authorization"
+        ];
+
+        localStorage.removeItem("user");
+        localStorage.removeItem("accessToken");
+
+        window.location.href = "/login";
+
+    };
+
+    // ==========================
+    // ROLE
+    // ==========================
+
+    const isAuthenticated = !!user;
+
+    const isAdmin = user?.role === "ADMIN";
+
+    const isSeller = user?.role === "SELLER";
+
+    const isCustomer = user?.role === "CUSTOMER";
+
+    // ==========================
+    // CONTEXT VALUE
+    // ==========================
+
+    const value = useMemo(() => ({
+
+        user,
+        loading,
+
+        login,
+        register,
+        logout,
+
+        getProfile,
+        updateProfile,
+        changePassword,
+
+        loginGoogle,
+        loginFacebook,
+
+        isAuthenticated,
+        isAdmin,
+        isSeller,
+        isCustomer,
+
+    }), [
+
+        user,
+        loading,
+        isAuthenticated,
+        isAdmin,
+        isSeller,
+        isCustomer,
+
+    ]);
+
+    return (
+        <AuthContext.Provider value={value}>
+            {children}
+        </AuthContext.Provider>
+    );
+
+};
+
+export const useAuth = () => useContext(AuthContext);
