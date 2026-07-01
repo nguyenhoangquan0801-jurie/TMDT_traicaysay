@@ -48,59 +48,53 @@ export const AuthProvider = ({ children }) => {
 
     }, []);
 
+    
+
     // ==========================
     // LOGIN
     // ==========================
 
     const login = async (data) => {
 
-        try {
+    try {
 
-            const res = await axios.post(`${API}/login`, {
-                email: data.email,
-                password: data.password,
-            });
+        const res = await axios.post(`${API}/login`, {
+            email: data.email,
+            password: data.password,
+        });
 
-            const token = res.data.token;
+        const token = res.data.token;
 
-            const loginUser = {
-                fullName: res.data.fullName,
-                email: res.data.email,
-                role: res.data.role,
-            };
+        const loginUser = {
+            fullName: res.data.fullName,
+            email: res.data.email,
+            role: res.data.role,
+        };
 
-            axios.defaults.headers.common[
-                "Authorization"
-            ] = `Bearer ${token}`;
+        axios.defaults.headers.common.Authorization = `Bearer ${token}`;
 
-            localStorage.setItem(
-                "accessToken",
-                token
-            );
+        localStorage.setItem("accessToken", token);
+        localStorage.setItem("user", JSON.stringify(loginUser));
 
-            localStorage.setItem(
-                "user",
-                JSON.stringify(loginUser)
-            );
+        setUser(loginUser);
 
-            setUser(loginUser);
+        return {
+            success: true,
+            data: loginUser,
+        };
 
-            return {
-                success: true,
-            };
+    } catch (err) {
 
-        } catch (err) {
+        return {
+            success: false,
+            message:
+                err.response?.data?.message ||
+                "Đăng nhập thất bại",
+        };
 
-            return {
-                success: false,
-                message:
-                    err.response?.data?.message ||
-                    "Đăng nhập thất bại",
-            };
+    }
 
-        }
-
-    };
+};
 
     // ==========================
     // REGISTER

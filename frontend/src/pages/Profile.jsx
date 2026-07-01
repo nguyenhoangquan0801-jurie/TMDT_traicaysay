@@ -1,22 +1,26 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
+
+
 const Profile = () => {
     const { user, getProfile, loading } = useAuth();
     const [error, setError] = useState("");
 
     useEffect(() => {
-        const loadProfile = async () => {
-            try {
-                setError("");
-                await getProfile();
-            } catch (err) {
-                setError("Không thể tải thông tin tài khoản.");
-            }
-        };
+    const loadProfile = async () => {
+        try {
+            setError("");
+            await getProfile();
+        } catch (err) {
+            setError("Không thể tải thông tin tài khoản.");
+        }
+    };
 
-        loadProfile();
-    }, [getProfile]);
+    loadProfile();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []);
 
     const handleRefresh = async () => {
         try {

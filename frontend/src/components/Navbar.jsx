@@ -13,6 +13,7 @@ const NAV_LINKS = [
 ];
 
 const Navbar = () => {
+  console.log("Navbar render");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');

@@ -196,7 +196,6 @@ function App() {
                 element={<SellerProducts />}
               />
             </Route>
-
             <Route
               path="/profile"
               element={
