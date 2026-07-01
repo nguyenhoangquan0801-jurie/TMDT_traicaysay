@@ -12,7 +12,7 @@ public class SellerInfoDTO {
 
     public SellerInfoDTO(Seller seller) {
         this.shopName = seller.getShopName();
-        this.username = seller.getUser().getUsername();
+        this.username = seller.getUser().getFullName();
         this.role = "Shop Đối Tác";
         this.notifications = 3;
     }

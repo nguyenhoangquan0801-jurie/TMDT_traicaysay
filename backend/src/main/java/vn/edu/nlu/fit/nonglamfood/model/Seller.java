@@ -2,6 +2,7 @@ package vn.edu.nlu.fit.nonglamfood.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import vn.edu.nlu.fit.nonglamfood.entity.User;
 
 @Entity
 @Table(name = "sellers")
